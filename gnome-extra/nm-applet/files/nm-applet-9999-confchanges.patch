@@ -1,0 +1,19 @@
+--- nm-applet.conf.orig	2008-04-25 00:42:33.000000000 +0200
++++ nm-applet.conf	2008-04-25 00:43:52.000000000 +0200
+@@ -11,14 +11,14 @@
+ 		<!-- Only root can get secrets -->
+ 		<allow send_interface="org.freedesktop.NetworkManagerSettings.Secrets"/>
+ 	</policy>
+-	<policy at_console="true">
++	<policy group="plugdev">
+ 		<allow own="org.freedesktop.NetworkManagerUserSettings"/>
+ 
+ 		<allow send_destination="org.freedesktop.NetworkManagerUserSettings"/>
+ 		<allow send_interface="org.freedesktop.NetworkManagerSettings"/>
+ 
+ 		<!-- Only root can get secrets -->
+-		<deny send_interface="org.freedesktop.NetworkManagerSettings.Secrets"/>
++		<allow send_interface="org.freedesktop.NetworkManagerSettings.Secrets"/>
+ 	</policy>
+ 	<policy context="default">
+ 		<deny own="org.freedesktop.NetworkManagerUserSettings"/>

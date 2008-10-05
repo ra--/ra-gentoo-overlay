@@ -1,0 +1,11 @@
+--- src/main.c.orig	2004-02-04 14:38:11.000000000 +0100
++++ src/main.c	2008-09-13 02:35:34.000000000 +0200
+@@ -173,7 +175,7 @@
+ 	}
+ 	device_name = argv[optind];
+ 	
+-	srandom(time(NULL));
++	srandom(getpid() * time(NULL));
+ 
+         /* Read the MAC */
+ 	if ((net = mc_net_info_new(device_name)) == NULL) exit(1);

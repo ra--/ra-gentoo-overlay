@@ -1,0 +1,24 @@
+--- grub-0.97-13-ima-1.1.0.0.patch.orig	2007-07-20 01:16:51.000000000 +0200
++++ grub-0.97-13-ima-1.1.0.0.patch	2008-04-03 20:22:39.860913949 +0200
+@@ -11,7 +11,7 @@
+  AC_CONFIG_SRCDIR([stage2/stage2.c])
+  AC_CONFIG_HEADER([config.h])
+  AM_INIT_AUTOMAKE
+-@@ -665,11 +665,30 @@
++@@ -660,6 +660,25 @@
+  CCASFLAGS='$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)'
+  AC_SUBST(CCASFLAGS)
+  
+@@ -37,12 +37,6 @@
+  
+  dnl Output.
+  AC_CONFIG_FILES([Makefile stage1/Makefile stage2/Makefile \
+- 		 docs/Makefile lib/Makefile util/Makefile \
+- 		 grub/Makefile netboot/Makefile util/grub-image \
+- 		 util/grub-install util/grub-md5-crypt \
+--		 util/grub-terminfo])
+-+		 util/grub-terminfo])
+- AC_OUTPUT
+ Index: grub-0.97-13/stage1/stage1.h
+ ===================================================================
+ --- grub-0.97-13/stage1/stage1.h	(revision 17)

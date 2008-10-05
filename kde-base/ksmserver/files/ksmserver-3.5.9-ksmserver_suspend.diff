@@ -1,0 +1,280 @@
+diff -Nur kdebase-3.5.5a.dfsg.1/ksmserver/Makefile.am kdebase-3.5.5a.dfsg.1.new/ksmserver/Makefile.am
+--- kdebase-3.5.5a.dfsg.1/ksmserver/Makefile.am	2006-01-19 18:01:08.000000000 +0100
++++ kdebase-3.5.5a.dfsg.1.new/ksmserver/Makefile.am	2006-12-07 00:56:36.000000000 +0100
+@@ -17,7 +17,7 @@
+ 
+ SUBDIRS = .
+ 
+-INCLUDES= -I$(top_srcdir)/kdmlib $(all_includes)
++INCLUDES= -I$(top_srcdir)/kdmlib $(all_includes) $(HAL_INCS) $(DBUS_INCS)
+ 
+ bin_PROGRAMS =
+ lib_LTLIBRARIES =
+@@ -31,7 +31,7 @@
+ 	KSMServerInterface.skel server.skel
+ 
+ ksmserver_la_LDFLAGS = $(all_libraries) -avoid-version -module
+-ksmserver_la_LIBADD = ../kdmlib/libdmctl.la $(LIB_KDEUI)
++ksmserver_la_LIBADD = ../kdmlib/libdmctl.la $(LIB_KDEUI) $(HAL_LIBS) $(DBUS_LIBS)
+ 
+ picsdir = $(kde_datadir)/ksmserver/pics
+ pics_DATA = shutdownkonq.png
+@@ -44,7 +44,7 @@
+ EXTRA_PROGRAMS = testsh
+ testsh_SOURCES = test.cpp
+ testsh_LDFLAGS = $(all_libraries) $(KDE_RPATH)
+-testsh_LDADD = $(LIB_KDEUI) shutdowndlg.lo ../kdmlib/libdmctl.la
++testsh_LDADD = $(LIB_KDEUI) shutdowndlg.lo ../kdmlib/libdmctl.la $(HAL_LIBS) $(DBUS_LIBS)
+ 
+ messages:
+ 	$(XGETTEXT) *.cpp -o $(podir)/ksmserver.pot
+diff -Nur kdebase-3.5.5a.dfsg.1/ksmserver/Makefile.in kdebase-3.5.5a.dfsg.1.new/ksmserver/Makefile.in
+--- kdebase-3.5.5a.dfsg.1/ksmserver/Makefile.in	2006-12-07 00:48:41.000000000 +0100
++++ kdebase-3.5.5a.dfsg.1.new/ksmserver/Makefile.in	2006-12-07 00:56:36.000000000 +0100
+@@ -655,7 +655,7 @@
+ xdg_directorydir = @xdg_directorydir@
+ xdg_menudir = @xdg_menudir@
+ SUBDIRS = .
+-INCLUDES = -I$(top_srcdir)/kdmlib $(all_includes)
++INCLUDES = -I$(top_srcdir)/kdmlib $(all_includes) $(HAL_INCS) $(DBUS_INCS)
+ #>- lib_LTLIBRARIES = 
+ #>+ 1
+ lib_LTLIBRARIES =   libkdeinit_ksmserver.la
+@@ -685,7 +685,7 @@
+ updatedir = $(kde_datadir)/kconf_update
+ testsh_SOURCES = test.cpp
+ testsh_LDFLAGS = $(all_libraries) $(KDE_RPATH)
+-testsh_LDADD = $(LIB_KDEUI) shutdowndlg.lo ../kdmlib/libdmctl.la
++testsh_LDADD = $(LIB_KDEUI) shutdowndlg.lo ../kdmlib/libdmctl.la $(HAL_LIBS) $(DBUS_LIBS)
+ #>- all: all-recursive
+ #>+ 1
+ all: docs-am  all-recursive
+@@ -1220,7 +1220,7 @@
+ .NOEXPORT:
+ 
+ #>+ 2
+-libkdeinit_ksmserver_la_LIBADD = ../kdmlib/libdmctl.la $(LIB_KDEUI)
++libkdeinit_ksmserver_la_LIBADD = ../kdmlib/libdmctl.la $(LIB_KDEUI) $(HAL_LIBS) $(DBUS_LIBS)
+ 
+ #>+ 2
+ libkdeinit_ksmserver_la_LDFLAGS = -no-undefined -avoid-version $(all_libraries)
+diff -Nur kdebase-3.5.5a.dfsg.1/ksmserver/shutdowndlg.cpp kdebase-3.5.5a.dfsg.1.new/ksmserver/shutdowndlg.cpp
+--- kdebase-3.5.5a.dfsg.1/ksmserver/shutdowndlg.cpp	2006-03-17 11:17:10.000000000 +0100
++++ kdebase-3.5.5a.dfsg.1.new/ksmserver/shutdowndlg.cpp	2006-12-07 00:57:06.000000000 +0100
+@@ -37,6 +37,10 @@
+ #include <kimageeffect.h>
+ #include <kdialog.h>
+ #include <kseparator.h>
++#include <kconfig.h>
++
++#include <dcopclient.h>
++#include <dcopref.h>
+ 
+ #include <sys/types.h>
+ #include <sys/utsname.h>
+@@ -130,6 +134,8 @@
+     buttonlay->addWidget( btnLogout );
+     connect(btnLogout, SIGNAL(clicked()), SLOT(slotLogout()));
+ 
++    m_halCtx = NULL;
++
+     if (maysd) {
+ 
+         // Shutdown
+@@ -167,6 +173,87 @@
+ 	  btnReboot->setPopup(targets);
+ 	  connect( targets, SIGNAL(activated(int)), SLOT(slotReboot(int)) );
+ 	}
++
++        // respect lock on resume & disable suspend/hibernate settings 
++        // from power-manager
++        KConfig config("power-managerrc");
++        bool disableSuspend = config.readBoolEntry("disableSuspend", false);
++        bool disableHibernate = config.readBoolEntry("disableHibernate", false);
++        m_lockOnResume = config.readBoolEntry("lockOnResume", true);
++
++        bool canSuspend = false;
++        bool canHibernate = false;
++
++        // Query HAL for suspend/resume support
++        m_halCtx = libhal_ctx_new();
++
++        DBusError error;
++        dbus_error_init(&error);
++        m_dbusConn = dbus_connection_open_private(DBUS_SYSTEM_BUS, &error);
++        if (!m_dbusConn)
++        {
++            dbus_error_free(&error);
++            libhal_ctx_free(m_halCtx);
++            m_halCtx = NULL;
++        }
++        else
++        {
++            dbus_bus_register(m_dbusConn, &error);
++            if (dbus_error_is_set(&error))
++            {
++                dbus_error_free(&error);
++                libhal_ctx_free(m_halCtx);
++                m_dbusConn = NULL;
++                m_halCtx = NULL;
++            }
++            else
++            {
++                libhal_ctx_set_dbus_connection(m_halCtx, m_dbusConn);
++                if (!libhal_ctx_init(m_halCtx, &error))
++                {
++                    if (dbus_error_is_set(&error))
++                        dbus_error_free(&error);
++                    libhal_ctx_free(m_halCtx);
++                    m_dbusConn = NULL;
++                    m_halCtx = NULL;
++                }
++            }
++        }
++
++        if (m_halCtx)
++        {
++            if (libhal_device_get_property_bool(m_halCtx,
++                                                "/org/freedesktop/Hal/devices/computer",
++                                                "power_management.can_suspend", 
++                                                NULL))
++            {
++                canSuspend = true;
++            }
++
++            if (libhal_device_get_property_bool(m_halCtx, 
++                                                "/org/freedesktop/Hal/devices/computer",
++                                                "power_management.can_hibernate",
++                                                NULL))
++            {
++                canHibernate = true;
++            }
++        }
++
++        if (canSuspend && !disableSuspend)
++        {
++            KPushButton* btnSuspend = new KPushButton( KGuiItem( i18n("&Suspend Computer"), "suspend"), frame );
++            btnSuspend->setFont( btnFont );
++            buttonlay->addWidget( btnSuspend );
++            connect(btnSuspend, SIGNAL(clicked()), SLOT(slotSuspend()));
++        }
++
++        if (canHibernate && !disableHibernate)
++        {
++            KPushButton* btnHibernate = new KPushButton( KGuiItem( i18n("&Hibernate Computer"), "hibernate"), frame );
++            btnHibernate->setFont( btnFont );
++            buttonlay->addWidget( btnHibernate );
++            connect(btnHibernate, SIGNAL(clicked()), SLOT(slotHibernate()));
++        }
+     }
+ 
+     buttonlay->addStretch( 1 );
+@@ -181,6 +268,17 @@
+ 
+ }
+ 
++KSMShutdownDlg::~KSMShutdownDlg()
++{
++    if (m_halCtx)
++    {
++        DBusError error;
++        dbus_error_init(&error);
++        libhal_ctx_shutdown(m_halCtx, &error);
++        libhal_ctx_free(m_halCtx);
++    }
++}
++
+ 
+ void KSMShutdownDlg::slotLogout()
+ {
+@@ -213,6 +311,52 @@
+     accept();
+ }
+ 
++void KSMShutdownDlg::slotSuspend()
++{
++    if (m_lockOnResume) {
++        DCOPRef("kdesktop", "KScreensaverIface").send("lock");
++    }
++
++    if (m_dbusConn) 
++    {
++        DBusMessage *msg = dbus_message_new_method_call(
++                              "org.freedesktop.Hal",
++                              "/org/freedesktop/Hal/devices/computer", 
++                              "org.freedesktop.Hal.Device.SystemPowerManagement", 
++                              "Suspend");
++
++        int wakeup=0;
++	    dbus_message_append_args(msg, DBUS_TYPE_INT32, &wakeup, DBUS_TYPE_INVALID);
++
++        dbus_connection_send(m_dbusConn, msg, NULL);
++
++        dbus_message_unref(msg);
++    }
++
++    reject(); // continue on resume
++}
++
++void KSMShutdownDlg::slotHibernate()
++{
++    if (m_lockOnResume) {
++        DCOPRef("kdesktop", "KScreensaverIface").send("lock");
++    }
++
++    if (m_dbusConn) 
++    {
++        DBusMessage *msg = dbus_message_new_method_call(
++                              "org.freedesktop.Hal",
++                              "/org/freedesktop/Hal/devices/computer", 
++                              "org.freedesktop.Hal.Device.SystemPowerManagement", 
++                              "Hibernate");
++
++        dbus_connection_send(m_dbusConn, msg, NULL);
++
++        dbus_message_unref(msg);
++    }
++
++    reject(); // continue on resume
++}
+ 
+ bool KSMShutdownDlg::confirmShutdown( bool maysd, KApplication::ShutdownType& sdtype, QString& bootOption )
+ {
+diff -Nur kdebase-3.5.5a.dfsg.1/ksmserver/shutdowndlg.h kdebase-3.5.5a.dfsg.1.new/ksmserver/shutdowndlg.h
+--- kdebase-3.5.5a.dfsg.1/ksmserver/shutdowndlg.h	2006-01-19 18:01:08.000000000 +0100
++++ kdebase-3.5.5a.dfsg.1.new/ksmserver/shutdowndlg.h	2006-12-07 00:57:06.000000000 +0100
+@@ -17,6 +17,11 @@
+ 
+ #include <kapplication.h>
+ 
++/* We acknowledge the the dbus API is unstable */
++#define DBUS_API_SUBJECT_TO_CHANGE
++#include <dbus/connection.h>
++#include <libhal.h>
++
+ // The (singleton) widget that makes the desktop gray.
+ class KSMShutdownFeedback : public QWidget
+ {
+@@ -54,9 +59,11 @@
+     void slotHalt();
+     void slotReboot();
+     void slotReboot(int);
++    void slotSuspend();
++    void slotHibernate();
+ 
+ protected:
+-    ~KSMShutdownDlg() {};
++    ~KSMShutdownDlg();
+ 
+ private:
+     KSMShutdownDlg( QWidget* parent, bool maysd, KApplication::ShutdownType sdtype );
+@@ -64,6 +71,9 @@
+     QString m_bootOption;
+     QPopupMenu *targets;
+     QStringList rebootOptions;
++    LibHalContext* m_halCtx;
++    DBusConnection *m_dbusConn;
++    bool m_lockOnResume;
+ };
+ 
+ class KSMDelayedPushButton : public KPushButton

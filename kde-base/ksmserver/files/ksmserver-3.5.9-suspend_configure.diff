@@ -1,0 +1,103 @@
+diff -urN ksmserver-3.5.7.orig/configure.in.in ksmserver-3.5.7/configure.in.in
+--- ksmserver-3.5.7.orig/configure.in.in	2006-07-22 10:15:55.000000000 +0200
++++ ksmserver-3.5.7/configure.in.in	2007-10-06 02:43:51.000000000 +0200
+@@ -274,3 +274,99 @@
+ AC_ARG_WITH([composite],
+   AC_HELP_STRING([--without-composite], [Disable Xcomposite support (default: check)]) )
+ 
++AC_ARG_WITH([hal],
++  AS_HELP_STRING([--with-hal],[Enable HAL support  (default: check)]),[hal_test="$withval"],[hal_test="yes"])
++
++if test "x$hal_test" = "xyes" ; then
++
++########### Check for the HAL
++  AC_MSG_CHECKING(for the HAL)
++
++  hal_inc=NOTFOUND
++  hal_lib=NOTFOUND
++  hal=NOTFOUND
++
++  search_incs="$kde_includes $kde_extra_includes /usr/include /usr/include/hal /usr/local/include /usr/local/include/hal"
++  AC_FIND_FILE(libhal.h libhal-storage.h, $search_incs, hal_incdir)
++
++  if test -r $hal_incdir/libhal.h && test -r $hal_incdir/libhal-storage.h && grep LibHalVolume $hal_incdir/libhal-storage.h > /dev/null 2>&1; then
++    HAL_INCS="-I$hal_incdir"
++    hal_inc=FOUND
++  fi
++
++  search_libs="$kde_libraries $kde_extra_libs /usr/lib$kdelibsuff /usr/local/lib$kdelibsuff"
++  AC_FIND_FILE(libhal.so libhal-storage.so, $search_libs, hal_libdir)
++
++  if test -r $hal_libdir/libhal.so && test -r $hal_libdir/libhal-storage.so ; then
++    HAL_LIBS="-L$hal_libdir -lhal -lhal-storage"
++    hal_lib=FOUND
++  fi
++
++  if test "$hal_inc" != FOUND || test "$hal_lib" != FOUND; then
++    KDE_PKG_CHECK_MODULES( HAL, hal > 0.5, [ HAL_INCS=$HAL_CFLAGS; hal_inc=FOUND; hal_lib=FOUND; ] , AC_MSG_RESULT(Nothing found on PKG_CONFIG_PATH) )
++  fi
++
++  if test "$hal_inc" = FOUND && test "$hal_lib" = FOUND ; then
++      AC_MSG_RESULT(headers $HAL_INCS  libraries $HAL_LIBS)
++      hal=FOUND
++  else
++      AC_MSG_RESULT(searched but not found)
++  fi
++
++
++  AC_SUBST(HAL_INCS)
++  AC_SUBST(HAL_LIBS)
++fi
++
++
++AC_ARG_WITH([dbus],
++  AS_HELP_STRING([--with-dbus],[Enable DBus support  (default: check)]),[dbus_test="$withval"],[dbus_test="yes"])
++
++if test "x$dbus_test" = "xyes" ; then
++########### Check for DBus
++
++  AC_MSG_CHECKING(for DBus)
++
++  dbus_inc=NOTFOUND
++  dbus_lib=NOTFOUND
++  dbus=NOTFOUND
++
++  search_incs="$kde_includes $kde_extra_includes /usr/include /usr/include/dbus-1.0 /usr/local/include /usr/local/include/dbus-1.0"
++  AC_FIND_FILE(dbus/dbus.h, $search_incs, dbus_incdir)
++
++  search_incs_arch_deps="$kde_includes $kde_extra_includes /usr/lib$kdelibsuff/dbus-1.0/include /usr/local/lib$kdelibsuff/dbus-1.0/include"
++  AC_FIND_FILE(dbus/dbus-arch-deps.h, $search_incs_arch_deps, dbus_incdir_arch_deps)
++
++  if test -r $dbus_incdir/dbus/dbus.h && test -r $dbus_incdir_arch_deps/dbus/dbus-arch-deps.h ; then
++    DBUS_INCS="-I$dbus_incdir -I$dbus_incdir_arch_deps"
++    dbus_inc=FOUND
++  fi
++
++  search_libs="$kde_libraries $kde_extra_libs /usr/lib$kdelibsuff /usr/local/lib$kdelibsuff"
++  AC_FIND_FILE(libdbus-1.so, $search_libs, dbus_libdir)
++
++  if test -r $dbus_libdir/libdbus-1.so ; then
++    DBUS_LIBS="-L$dbus_libdir -ldbus-1"
++    dbus_lib=FOUND
++  fi
++
++  if test $dbus_inc != FOUND || test $dbus_lib != FOUND ; then
++    KDE_PKG_CHECK_MODULES( DBUS, "dbus-1", [ DBUS_INCS=$DBUS_CFLAGS; dbus_inc=FOUND; dbus_lib=FOUND; ] , AC_MSG_RESULT( Nothing found on PKG_CONFIG_PATH ) )
++  fi
++
++  dbus_bus_var=`pkg-config --variable=system_bus_default_address dbus-1 2>/dev/null`
++  if test -z "$dbus_bus_var"; then
++        dbus_bus_var="unix:path=/var/run/dbus/system_bus_socket"
++  fi
++  AC_DEFINE_UNQUOTED(DBUS_SYSTEM_BUS, "$dbus_bus_var", [Define the unix domain path for dbus system bus])
++
++  if test $dbus_inc = FOUND && test $dbus_lib = FOUND ; then
++    AC_MSG_RESULT(headers $DBUS_INCS libraries $DBUS_LIBS)
++    dbus=FOUND
++  else
++    AC_MSG_RESULT(searched but not found)
++  fi
++
++  AC_SUBST(DBUS_INCS)
++  AC_SUBST(DBUS_LIBS)
++fi
