@@ -1,0 +1,13 @@
+diff --git a/src/clients/reconcilio/fix_linkage.cc b/src/clients/reconcilio/fix_linkage.cc
+index 2f04779..88200da 100644
+--- a/src/clients/reconcilio/fix_linkage.cc
++++ b/src/clients/reconcilio/fix_linkage.cc
+@@ -50,7 +50,7 @@ do_fix_linkage(const std::tr1::shared_ptr<Environment> & env)
+     std::string library(CommandLine::get_instance()->a_library.argument());
+ 
+     if (library.empty())
+-        std::cout << "Searching for broken packages... " << std::flush;
++	Log::get_instance()->message("Searching for broken packages...", ll_debug, lc_context);
+     else
+         std::cout << "Searching for packages that depend on " << library << "... " << std::flush;
+     BrokenLinkageFinder finder(env.get(), library);

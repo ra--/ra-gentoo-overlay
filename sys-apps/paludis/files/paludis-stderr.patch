@@ -1,0 +1,172 @@
+diff --git a/paludis/fetchers/dofile b/paludis/fetchers/dofile
+index 190639a..d8e721f 100755
+--- a/paludis/fetchers/dofile
++++ b/paludis/fetchers/dofile
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ 
+ shopt -s extglob
+-echo cp "/${1##file:+(/)}" "${2}" 1>&2
++echo cp "/${1##file:+(/)}" "${2}"
+ cp "/${1##file:+(/)}" "${2}"
+ 
+diff --git a/paludis/fetchers/doftp b/paludis/fetchers/doftp
+index 165888c..d2a5f90 100644
+--- a/paludis/fetchers/doftp
++++ b/paludis/fetchers/doftp
+@@ -38,7 +38,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+         fi
+     fi
+ 
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" ; then
+         echo mv -f "${2}".-PARTIAL- "${2}"
+         mv -f "${2}".-PARTIAL- "${2}"
+@@ -49,7 +49,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+     fi
+ 
+ else
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" ; then
+         exit 0
+     else
+diff --git a/paludis/fetchers/dohttp b/paludis/fetchers/dohttp
+index 165888c..d2a5f90 100644
+--- a/paludis/fetchers/dohttp
++++ b/paludis/fetchers/dohttp
+@@ -38,7 +38,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+         fi
+     fi
+ 
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" ; then
+         echo mv -f "${2}".-PARTIAL- "${2}"
+         mv -f "${2}".-PARTIAL- "${2}"
+@@ -49,7 +49,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+     fi
+ 
+ else
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" ; then
+         exit 0
+     else
+diff --git a/paludis/fetchers/dohttps b/paludis/fetchers/dohttps
+index 165888c..d2a5f90 100644
+--- a/paludis/fetchers/dohttps
++++ b/paludis/fetchers/dohttps
+@@ -38,7 +38,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+         fi
+     fi
+ 
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" ; then
+         echo mv -f "${2}".-PARTIAL- "${2}"
+         mv -f "${2}".-PARTIAL- "${2}"
+@@ -49,7 +49,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+     fi
+ 
+ else
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" ; then
+         exit 0
+     else
+diff --git a/paludis/fetchers/dowget.in b/paludis/fetchers/dowget.in
+index 165888c..d2a5f90 100755
+--- a/paludis/fetchers/dowget.in
++++ b/paludis/fetchers/dowget.in
+@@ -38,7 +38,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+         fi
+     fi
+ 
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 --continue -O "${2}".-PARTIAL- "${1}" ; then
+         echo mv -f "${2}".-PARTIAL- "${2}"
+         mv -f "${2}".-PARTIAL- "${2}"
+@@ -49,7 +49,7 @@ if [[ -n "${PALUDIS_USE_SAFE_RESUME}" ]] ; then
+     fi
+ 
+ else
+-    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" 1>&2
++    echo ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}"
+     if ${WGET_WRAPPER} ${LOCAL_WGET:-wget} ${EXTRA_WGET} -T 30 -t 1 -O "${2}" "${1}" ; then
+         exit 0
+     else
+diff --git a/paludis/repositories/e/ebuild/utils/unpack b/paludis/repositories/e/ebuild/utils/unpack
+index 7f60310..92e8c12 100755
+--- a/paludis/repositories/e/ebuild/utils/unpack
++++ b/paludis/repositories/e/ebuild/utils/unpack
+@@ -54,48 +54,48 @@ unpack_one()
+ 
+     case "${x}" in
+         *.tar)
+-            echo tar xf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" 1>&2
++            echo tar xf "${1}" --no-same-owner "${TAR_OPTIONS[@]}"
+             tar xf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.tar.gz|*.tgz|*.tar.Z)
+-            echo tar zxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" 1>&2
++            echo tar zxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}"
+             tar zxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.tar.bz2|*.tbz2|*.tbz)
+-            echo tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" ${UNPACKONLY} 1>&2
++            echo tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" ${UNPACKONLY}
+             tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" ${UNPACKONLY} || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.zip|*.ZIP|*.jar)
+-            echo unzip -qo "${1}" 1>&2
++            echo unzip -qo "${1}"
+             unzip -qo "${1}" || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.gz|*.Z|*.z)
+-            echo gzip -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" ) 1>&2
++            echo gzip -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" )
+             gzip -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" ) || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.bz2)
+-            echo bzip2 -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" ) 1>&2
++            echo bzip2 -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" )
+             bzip2 -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" ) || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.rar|*.RAR)
+-            echo unrar x -idq "${1}" 1>&2
++            echo unrar x -idq "${1}"
+             unrar x -idq "${1}" || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.LHa|*.LHA|*.lha|*.lzh)
+-            echo lha xqf "${1}" 1>&2
++            echo lha xqf "${1}"
+             lha xqf "${1}" || die "Couldn't unpack ${1}"
+             ;;
+ 
+         *.a|*.deb)
+-            echo ar x "${1}" 1>&2
+-            ar x "${1}" 1>&2
++            echo ar x "${1}"
++            ar x "${1}"
+             ;;
+ 
+         *.tar.lzma)
+@@ -105,7 +105,7 @@ unpack_one()
+             ;;
+ 
+         *.lzma)
+-            echo lzma -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" ) 1>&2
++            echo lzma -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" )
+             lzma -dc "${1}" > ${UNPACKTODIR}/$(basename "${1%.*}" ) || die "Couldn't unpack ${1}"
+             ;;
+ 

@@ -1,0 +1,14 @@
+diff --git a/paludis/repositories/e/ebuild/0/output_functions.bash b/paludis/repositories/e/ebuild/0/output_functions.bash
+index b6cee47..57908e2 100644
+--- a/paludis/repositories/e/ebuild/0/output_functions.bash
++++ b/paludis/repositories/e/ebuild/0/output_functions.bash
+@@ -24,7 +24,9 @@ ebuild_notice()
+ 
+ ebuild_section()
+ {
++  if [ "${PALUDIS_EBUILD_LOG_LEVEL}" = 'debug' ]; then
+     echo -ne "${COLOUR_GREEN}>>>${COLOUR_NORMAL} "
+     echo "$@"
++  fi
+ }
+ 
