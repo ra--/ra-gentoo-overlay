@@ -21,28 +21,39 @@ DEPEND="${RDEPEND}
 		>dev-libs/glib-2.0"
 
 src_compile() {
-	CFLAGS="${CFLAGS} -I/usr/include/libpurple -DPURPLE_PLUGINS
-	-DUSE_XVFB_SERVER -Wall -pthread -I/usr/include/glib-2.0
-	-I/usr/lib/glib-2.0/include -shared -fPIC -I."
-	
+	GLIB_CFLAGS="-I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+	-I/usr/include"
+	LIBPURPLE_CFLAGS="-I/usr/include/libpurple -DPURPLE_PLUGINS"
+
 	if use nls; then
-		CFLAGS="${CFLAGS} -DENABLE_NLS"
+		LIBPURPLE_CFLAGS="${LIBPURPLE_CFLAGS} -DENABLE_NLS"
 	fi
+
+	CFLAGS="${CFLAGS} ${LIBPURPLE_CFLAGS} -Wall -pthread ${GLIB_CFLAGS} -I.
+	-shared -fPIC -DPIC"
 	
 	cc ${CFLAGS} -o libskype.so libskype.c || die 'Error compiling library!'
+	cc ${CFLAGS} -DSKYPENET -o libskypenet.so libskype.c || die 'Error compiling library!'
+	#cc ${CFLAGS} -m32 -m64 -o libskype64.so libskype.c || die 'Error compiling library!'
+	#cc ${CFLAGS} -DSKYPENET -m32 -m64 -o libskypenet64.so libskype.c || die 'Error compiling library!'
 	
 	if use dbus; then
-		CFLAGS="${CFLAGS} -DSKYPE_DBUS -I/usr/include/dbus-1.0 
+		DBUS_CFLAGS="-DSKYPE_DBUS -I/usr/include/dbus-1.0 
 		-I/usr/lib/dbus-1.0/include -o libskype_dbus.so"
-		cc ${CFLAGS} -o libskype_dbus.so libskype.c || die 'Error compiling library!'
+		cc ${CFLAGS} ${DBUS_CFLAGS} -o libskype_dbus.so libskype.c || die 'Error compiling library!'
+		#cc ${CFLAGS} ${DBUS_CFLAGS} -m32 -m64 -o libskype_dbus64.so libskype.c || die 'Error compiling library!'
 	fi
 }
 
 src_install() {
 	insinto /usr/lib/purple-2
 	doins "libskype.so"
+	doins "libskypenet.so"
+	#doins "libskype64.so"
+	#doins "libskype64.so"
 	if use dbus; then
 		doins "libskype_dbus.so"
+		#doins "libskype_dbus64.so"
 	fi
 
 	insinto /usr/share/pixmaps/pidgin/emotes/default-skype
