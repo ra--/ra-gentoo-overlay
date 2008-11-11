@@ -1,0 +1,21 @@
+#!/sbin/runscript
+# Copyright 1999-2007 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: 
+
+depend() {
+	before device-mapper lvm
+}
+
+start() {
+	ebegin "Starting dmeventd"
+	start-stop-daemon --start --exec /sbin/dmeventd
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping dmeventd"
+	start-stop-daemon --stop --exec /sbin/dmeventd
+	eend $?
+}
+
