@@ -30,7 +30,7 @@ src_compile() {
 		--libdir=/$(get_libdir) \
 		--sbindir=/sbin \
 		--enable-dmeventd \
-		--with-dmeventd-pidfile=/root/dmeventd.pid \
+		--with-dmeventd-pidfile=/.dmeventd.pid \
 		--enable-pkgconfig \
 		$(use_enable selinux) \
 		CLDFLAGS="${LDFLAGS}" || die "econf failed"
