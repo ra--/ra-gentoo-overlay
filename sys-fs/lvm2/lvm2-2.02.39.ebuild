@@ -28,7 +28,7 @@ S="${WORKDIR}/${PN/lvm/LVM}.${PV}"
 pkg_setup() {
 	use nolvmstatic && eerror "USE=nolvmstatic has changed to USE=static via package.use"
 	use nolvm1 && eerror "USE=nolvm1 has changed to USE=lvm1 via package.use"
-	filter-ldflags -Wl,--as-needed --as-needed
+	append-ldflags -Wl,--no-as-needed
 }
 
 src_unpack() {
