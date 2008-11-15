@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit eutils flag-o-matic toolchain-funcs
+inherit eutils flag-o-matic linux-info toolchain-funcs
 
 # versions as of 2008/04/07
 SQUASH_PV="squashfs${PV}"
@@ -26,7 +26,14 @@ RDEPEND="sys-libs/zlib"
 
 
 pkg_setup() {
-	filter-ldflags -Wl,--as-needed --as-needed
+	if kernel_is lt 2 6 24; then
+		eerror
+		eerror "${P} needs kernel 2.6.24 or above."
+		eerror
+		die "Upgrade kernel"
+	fi
+	
+	append-ldflags -Wl,--no-as-needed
 }
 
 src_unpack() {
@@ -84,8 +91,4 @@ src_install() {
 	dodoc README ACKNOWLEDGEMENTS CHANGES COPYING PERFORMANCE.README README-3.3
 	cd ..
 	use lzma && dodoc sqlzma.txt
-}
-
-pkg_postinst() {
-	ewarn "This version of mksquashfs requires a 2.6.24 kernel or better."
 }
