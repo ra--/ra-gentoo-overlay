@@ -1,0 +1,310 @@
+--- kmail/kmfilteraction.cpp	(revision 622717)
++++ kmail/kmfilteraction.cpp	(working copy)
+@@ -40,7 +40,11 @@ using KMail::RegExpLineEdit;
+ #include <kprocess.h>
+ #include <kaudioplayer.h>
+ #include <kurlrequester.h>
++#include <kabc/addressbook.h>
++#include <kabc/stdaddressbook.h>
++#include <kabc/resource.h>
+ 
++#include <qtooltip.h>
+ #include <qlabel.h>
+ #include <qlayout.h>
+ #include <qtextcodec.h>
+@@ -592,6 +596,275 @@ KMFilterAction::ReturnCode KMFilterActio
+   return GoOn;
+ }
+ 
++//=============================================================================
++// KMFilterActionAddToAddressBook
++// - add email address from header to address book
++//=============================================================================
++class KMFilterActionAddToAddressBook: public KMFilterActionWithStringList
++{
++public:
++  KMFilterActionAddToAddressBook();
++  virtual ReturnCode process( KMMessage* msg ) const;
++  static KMFilterAction* newAction();
++
++  virtual bool isEmpty() const { return false; }
++
++  virtual QWidget* createParamWidget( QWidget* parent ) const;
++  virtual void setParamWidgetValue( QWidget* paramWidget ) const;
++  virtual void applyParamWidgetValue( QWidget* paramWidget );
++  virtual void clearParamWidget( QWidget* paramWidget ) const;
++
++  virtual const QString argsAsString() const;
++  virtual void argsFromString( const QString argsStr );
++
++private:
++  void updateLookups();
++  QString mCategory, mResourceName;
++  QMap<QString, KABC::Resource*> mResourceByName, mResourceByID;
++  const QString mStdResourceString, mFromStr, mToStr, mCCStr, mBCCStr;
++};
++
++KMFilterAction* KMFilterActionAddToAddressBook::newAction()
++{
++  return (new KMFilterActionAddToAddressBook);
++}
++
++KMFilterActionAddToAddressBook::KMFilterActionAddToAddressBook()
++  : KMFilterActionWithStringList( "add to address book", i18n("Add To Address Book") ),
++    mStdResourceString( i18n( "<default>" ) ), mFromStr( i18n( "From" ) ), 
++    mToStr( i18n( "To" ) ), mCCStr( i18n( "CC" ) ), mBCCStr( i18n( "BCC" ) )
++{
++  mParameterList.append( mFromStr );
++  mParameterList.append( mToStr );
++  mParameterList.append( mCCStr );
++  mParameterList.append( mBCCStr );
++
++  mParameter = *mParameterList.at(0);
++
++  updateLookups();
++  mResourceName = mStdResourceString;
++  mCategory = i18n( "kmail-autoadd" );
++}
++
++void KMFilterActionAddToAddressBook::updateLookups()
++{
++  //find resources in standard addressbook 
++  //and prepare lookups
++  QPtrList<KABC::Resource> list =  KABC::StdAddressBook::self()->resources();
++  for ( KABC::Resource* res = list.first() ; res; res = list.next() ) {
++    if ( !res->readOnly() && res->isOpen() ) {
++      mResourceByID.insert( res->identifier(), res );
++      mResourceByName.insert( res->resourceName(), res );
++    }
++  }
++}
++
++KMFilterAction::ReturnCode KMFilterActionAddToAddressBook::process( KMMessage* msg ) const
++{
++  QString headerLine;
++  if ( mParameter == mFromStr )
++    headerLine = msg->from();
++  else if ( mParameter == mToStr )
++    headerLine = msg->to();
++  else if ( mParameter == mCCStr )
++    headerLine = msg->cc();
++  else if ( mParameter == mBCCStr )
++    headerLine = msg->bcc();
++ 
++  QStringList emails = KPIM::splitEmailAddrList( headerLine );
++
++  KABC::AddressBook *ab = KABC::StdAddressBook::self();
++  // force a reload of the address book file so that changes that were made
++  // by other programs are loaded
++  ab->load();
++
++  QString email;
++  QString name;
++
++  QMap<QString, KABC::Resource*>::const_iterator it = mResourceByName.find( mResourceName );
++  KABC::Resource* res = 0; 
++  //if it==end(), then the resouce has been removed from addressbook
++  //or default has been selected, in either case store in default resource
++  if ( it != mResourceByName.end() )
++    res = it.data();
++
++  KABC::Ticket *ticket = ab->requestSaveTicket( res );
++
++  if ( ticket ) {
++    for ( QStringList::Iterator it = emails.begin(); it != emails.end(); ++it ) {
++      KABC::Addressee::parseEmailAddress( *it, name, email );
++      KABC::Addressee::List addressees = ab->findByEmail( email );
++
++      if ( addressees.isEmpty() ) {
++        KABC::Addressee a;
++        a.setNameFromString( name );
++        a.insertEmail( email, true );
++        if ( !mCategory.isEmpty() )
++          a.insertCategory( mCategory );
++        if( res )
++          a.setResource( res );
++
++        ab->insertAddressee(a);
++      }
++    }
++
++    if ( !ab->save( ticket ) )
++      ab->error( i18n( "Can't save new addresses to address book." ) );
++  } else 
++    ab->error( i18n( "Can't save to address book. Address book is locked." ) );
++
++  return GoOn;
++}
++
++QWidget* KMFilterActionAddToAddressBook::createParamWidget( QWidget* parent ) const
++{
++  QWidget *w = new QWidget( parent );
++  QHBoxLayout *hbl = new QHBoxLayout( w );
++  hbl->setSpacing( 4 );
++  
++  QComboBox *cb = new QComboBox( FALSE, w, "combo" );
++  cb->setInsertionPolicy( QComboBox::AtBottom );
++  hbl->addWidget( cb, 0 /* stretch */ );
++  
++  QLabel *l = new QLabel( i18n( "with category" ), w );
++  l->setFixedWidth( l->sizeHint().width() );
++  hbl->addWidget( l, 0 );
++  
++  QLineEdit *le = new KLineEdit( w, "ledit" );
++  hbl->addWidget( le, 1 );
++  
++  l = new QLabel( i18n( "in resource" ), w );
++  l->setFixedWidth( l->sizeHint().width() );
++  hbl->addWidget( l, 0 );
++
++  cb = new QComboBox( FALSE, w, "resCombo" );
++  QToolTip::add( cb, i18n( "This defines the preferred resource.<br>"
++        "If it is not accesible, the filter will fallback to &lt default&gt .<br>"
++        "<b>Notice:</b> changes to the addressbook will not be visible here until kmail has been restarted.") );
++  cb->setInsertionPolicy( QComboBox::AtBottom );
++  hbl->addWidget( cb, 0 /* stretch */ );
++
++  setParamWidgetValue( w );
++  return w;
++}
++
++void KMFilterActionAddToAddressBook::setParamWidgetValue( QWidget* paramWidget ) const
++{
++  QComboBox *cb = (QComboBox*)paramWidget->child( "combo" );
++  Q_ASSERT( cb );
++  cb->clear();
++  cb->insertStringList( mParameterList );
++  int idx = mParameterList.findIndex( mParameter );
++  if ( idx < 0 ) {
++   kdDebug(5006)<<"unknown mParameter in KMFilterActionAddToAddressBook::setParamWidgetValue. strange???"<<endl;
++    cb->insertItem( mParameter );
++    cb->setCurrentItem( cb->count() - 1 );
++  } else {
++    cb->setCurrentItem( idx );
++  }
++
++  QLineEdit *le = (QLineEdit*)paramWidget->child( "ledit" );
++  Q_ASSERT( le );
++  le->setText( mCategory );
++
++  QStringList list = mResourceByName.keys();
++  idx = list.findIndex( mResourceName );
++  cb = (QComboBox*)paramWidget->child( "resCombo" );
++  Q_ASSERT( cb );
++  cb->clear();
++  cb->insertItem( mStdResourceString );
++  cb->insertStringList( mResourceByName.keys() );
++  if ( idx < 0 ) {
++    cb->setCurrentItem( 0 );
++  } else {
++    cb->setCurrentItem( idx + 1 /*mStdResourceString is not in keys() */ );
++  }
++
++}
++
++void KMFilterActionAddToAddressBook::applyParamWidgetValue( QWidget* paramWidget )
++{
++  QComboBox *cb = (QComboBox*)paramWidget->child( "combo" );
++  Q_ASSERT( cb );
++  mParameter = cb->currentText();
++
++  QLineEdit *le = (QLineEdit*)paramWidget->child( "ledit" );
++  Q_ASSERT( le );
++  mCategory = le->text();
++
++  cb = (QComboBox*)paramWidget->child( "resCombo" );
++  Q_ASSERT( cb );
++  mResourceName = cb->currentText();
++}
++
++void KMFilterActionAddToAddressBook::clearParamWidget( QWidget* paramWidget ) const
++{
++  QComboBox *cb = (QComboBox*)paramWidget->child( "combo" );
++  Q_ASSERT( cb );
++  cb->setCurrentItem( 0 );
++  QLineEdit *le = (QLineEdit*)paramWidget->child( "ledit" );
++  Q_ASSERT( le );
++  le->setText( i18n( "kmail-autoadd" ) );
++  cb = (QComboBox*)paramWidget->child( "resCombo" );
++  Q_ASSERT( cb );
++  cb->setCurrentItem( 0 );
++}
++
++const QString KMFilterActionAddToAddressBook::argsAsString() const
++{
++  QString result;
++
++  if ( mParameter == mFromStr )
++    result = "From";
++  else if ( mParameter == mToStr )
++    result = "To";
++  else if ( mParameter == mCCStr )
++    result = "CC";
++  else if ( mParameter == mBCCStr )
++    result = "BCC";
++
++  result += '\t';
++
++  QMap<QString, KABC::Resource*>::const_iterator it =  mResourceByName.find( mResourceName );
++  if ( it != mResourceByName.end() )
++    result += it.data()->identifier();
++  else
++    result += mStdResourceString;
++
++  result += '\t';
++
++  result += mCategory;
++
++  return result;
++}
++
++void KMFilterActionAddToAddressBook::argsFromString( const QString argsStr )
++{
++  updateLookups();
++
++  QStringList l = QStringList::split( '\t', argsStr, TRUE /*allow empty entries*/ );
++
++  mParameter = l[0];
++  if ( mParameter == "From" )
++    mParameter = mFromStr;
++  else if ( mParameter == "To" )
++    mParameter = mToStr;
++  else if ( mParameter == "CC" )
++    mParameter = mCCStr;
++  else if ( mParameter == "BCC" )
++    mParameter = mBCCStr;
++
++  QMap<QString, KABC::Resource*>::iterator it  = mResourceByID.find( l[1] );
++  if ( it != mResourceByID.end() )
++    mResourceName = it.data()->resourceName();
++  else
++    mResourceName = mStdResourceString;
++
++  if ( l.count() < 3 )
++    mCategory = "";
++  else
++    mCategory = l[2];
++}
+ 
+ 
+ //=============================================================================
+@@ -1548,6 +1821,11 @@ KMFilterActionRedirect::KMFilterActionRe
+ 
+ KMFilterAction::ReturnCode KMFilterActionRedirect::process(KMMessage* aMsg) const
+ {
++  //avoid endless loop in outbound filters
++  const QString resentTo = aMsg->headerField( "Resent-To" );
++  if ( KMMessage::addressIsInAddressList( mParameter, resentTo ) )
++    return ErrorButGoOn;
++
+   KMMessage* msg;
+   if ( mParameter.isEmpty() )
+     return ErrorButGoOn;
+@@ -1885,6 +2163,7 @@ void KMFilterActionDict::init(void)
+   insert( KMFilterActionAddHeader::newAction );
+   insert( KMFilterActionRewriteHeader::newAction );
+   insert( KMFilterActionExecSound::newAction );
++  insert( KMFilterActionAddToAddressBook::newAction );
+   // Register custom filter actions below this line.
+ }
+ // The int in the QDict constructor (41) must be a prime
