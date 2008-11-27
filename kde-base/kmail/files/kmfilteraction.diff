@@ -1,9 +1,10 @@
 --- kmail/kmfilteraction.cpp	(revision 622717)
 +++ kmail/kmfilteraction.cpp	(working copy)
-@@ -40,7 +40,11 @@ using KMail::RegExpLineEdit;
+@@ -40,7 +40,12 @@ using KMail::RegExpLineEdit;
  #include <kprocess.h>
  #include <kaudioplayer.h>
  #include <kurlrequester.h>
++#include <kapplication.h>
 +#include <kabc/addressbook.h>
 +#include <kabc/stdaddressbook.h>
 +#include <kabc/resource.h>
@@ -12,6 +13,23 @@
  #include <qlabel.h>
  #include <qlayout.h>
  #include <qtextcodec.h>
+@@ -527,10 +529,15 @@
+   shProc << commandLine;
+
+   // run process:
+-  if ( !shProc.start( KProcess::Block,
++  if ( !shProc.start( KProcess::NotifyOnExit,
+                       withOutput ? KProcess::Stdout
+                                  : KProcess::NoCommunication ) )
+     return ErrorButGoOn;
++
++  while ( shProc.isRunning() )
++  {
++    kapp->processEvents( 20 ); //FIXMEEEEEEEEEEEEEEEEEE!
++  }
+
+   if ( !shProc.normalExit() || shProc.exitStatus() != 0 ) {
+     return ErrorButGoOn;
 @@ -592,6 +596,275 @@ KMFilterAction::ReturnCode KMFilterActio
    return GoOn;
  }
