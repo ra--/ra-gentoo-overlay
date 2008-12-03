@@ -1,6 +1,6 @@
 --- kmail/kmfilteraction.cpp	(revision 622717)
 +++ kmail/kmfilteraction.cpp	(working copy)
-@@ -40,7 +40,12 @@ using KMail::RegExpLineEdit;
+@@ -40,7 +40,11 @@ using KMail::RegExpLineEdit;
  #include <kprocess.h>
  #include <kaudioplayer.h>
  #include <kurlrequester.h>
