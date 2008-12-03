@@ -1,0 +1,16 @@
+# ChangeLog for app-paludis/paludis-hooks-undo-prelink
+# Distributed under the GPL v2
+# $Header: $
+
+2007-07-22: v2.1 : Suppress some irrelevant warnings from trunk Paludis.
+2007-02-24: v2.0 : Port to Paludis 0.20+.
+2007-02-13: v1.4 : Simplify the code a lot, maybe even a small speedup. Also fixed a glitch in the (disabled by default) timing code.
+2007-02-12: v1.3 : Be less case-sensitive. Also simplify the code a bit.
+2007-02-05: Work properly on packages that contain files with no newlines.
+2007-01-23: Make it work when reinstalling the same version that's already installed. (Usage instructions have changed, see above.)
+2007-01-16: Fix i18n bug (and prune a bit of redundant code).
+2007-01-15: Big speed-up on large packages.
+2007-01-14: Print a message at the start, so it doesn't look like it's died with large packages.
+2007-01-05: Support ${ROOT} (d'oh).
+2007-01-04: Replace call to cut with pattern match.
+2007-01-04: Initial release.

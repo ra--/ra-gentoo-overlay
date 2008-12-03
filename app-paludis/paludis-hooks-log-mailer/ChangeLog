@@ -1,0 +1,7 @@
+# ChangeLog for app-paludis/paludis-hooks-log-mailer
+# Distributed under the GPL v2
+# $Header: $
+2007-12-22 ver 0.4 : added local delivery support
+2007-10-13 ver 0.2 : fixed ebuild to install properly and 
+                     minor fixes to the bash script
+2007-10-13 Initial entry - version 0.1

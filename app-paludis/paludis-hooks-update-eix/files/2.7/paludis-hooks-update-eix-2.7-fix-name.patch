@@ -1,0 +1,14 @@
+--- update-eix.hook     2008-07-04 14:16:29.000000000 +0200
++++ common/update-eix.hook_new  2008-08-10 03:22:26.000000000 +0200
+@@ -20,8 +20,8 @@
+ [[ -f ${ROOT}/etc/paludis/hooks/config/update-eix.conf ]] && source ${ROOT}/etc/paludis/hooks/config/update-eix.conf
+
+ # source the update-eix functions
+-if [[ -f ${ROOT}/usr/bin/update-eix-functions.sh ]]; then
+-    source ${ROOT}/usr/bin/update-eix-functions.sh
++if [[ -f ${ROOT}/usr/bin/functions-eix.sh ]]; then
++    source ${ROOT}/usr/bin/functions-eix.sh
+ else
+     eerror "I can't find ${ROOT}/usr/bin/update-eix-functions.sh, aborting"
+     exit 0
+

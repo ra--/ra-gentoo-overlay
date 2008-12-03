@@ -1,0 +1,9 @@
+# ChangeLog for app-paludis/paludis-hooks
+# Distributed under the GPL v2
+# $Header: $
+
+2007-12-15 ~x86-fbsd keyworded
+2007-03-12 ver 0.3.2 - addition of eselect for hooks
+2007-03-07 ver 0.3.1 - addition of compress-man hook
+2007-02-23 Initial entry - starting with version 0.2.1
+2007-03-01 ver 0.3.0 - addition of nice functionality for paludis
