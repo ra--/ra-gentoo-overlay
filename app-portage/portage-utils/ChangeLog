@@ -1,0 +1,268 @@
+=================================================================
+== portage-utils, patch for overlays and paludis compatibility ==
+=================================================================
+
+29.03.2008 : ver 20070504-r3 : creidiki
+	     	Delete unnecessary URI to hook tarball
+25.03.2008 : ver 20070504-r3 : creidiki
+	        Split hooks to separate packages.
+
+18.03.2008 : ver 20070504-r2 : (thanks to creidiki)
+		q-reinitialize.bash --> q-reinitialize.hook 
+		generate-metadata.hook 
+
+23.01.2008 : ver 20070504-r1 : slot patch added (thanks to mrwoody)
+
+== version 20070410 ==
+# fix the -t switch for qlop from last version
+
+== version 20070405 ==
+# added info on the output of qlop --current, now possible to estimate
+how long before the whole install process finish:
+    while installing some stuffs, check this:
+     qlop -c  <-- this one is what you've had until now
+     qlop -cv
+     qlop -cvv
+
+# added informations, on how many package where searched, and on how many no
+previous install was found, in qlop -tv output (thanks to niki!)
+# added a --pipe switch to qlop to do things like:
+  paludis -ip world --log-level silent | qlop --pipe
+    media-gfx/gimp : 1449 seconds average for 3 merges
+    x11-apps/xinit : 16 seconds average for 3 merges
+    app-emulation/wine : 1511 seconds average for 9 merges
+    sys-apps/usbutils : 18 seconds average for 4 merges
+    sys-devel/gdb : 307 seconds average for 3 merges
+    sys-apps/einit : 32 seconds average for 33 merges
+    sys-apps/dbus : 159 seconds average for 4 merges
+    sys-apps/iproute2 : 33 seconds average for 1 merges
+    Total estimated time: 3525 seconds (8 packages)
+ 
+# added and adapted latest patch from TGL on bgo:
+    qgrep enhancement: searching through ebuild in the VDB
+
+
+
+== version 20070401 == (and no this is not an april fool..)
+# fixed a small bug with how p-u handles CACHE_EBUILD_FILE and CACHE_METADATA_FILE env var
+# added and adapted patches from bug 171374
+  qgrep enhancements:
+	*speed improvement
+	* new options:
+	   --with-name:		Print the package or eclass name for each match
+	   --list:		Only print FILE names containing matches
+	   --invert-list:	Only print FILE names containing no match
+	   --extended:		Use PATTERN as an extended regular expression
+	   --before    arg	Print <arg> lines of leading context
+	   --after     arg	Print <arg> lines of trailing context
+
+# modified qsearch for a little speed improvement (same trick as TGL suggested in the 
+regexp_compilation_speedup.patch from the bug above)
+  before:
+     time qsearch -N app-/ut::ge.*o$ >/dev/null
+	real    0m0.165s
+	user    0m0.155s
+	sys     0m0.007s
+  after:
+      time ./q search -N app-/ut::ge.*o$ >/dev/null
+	real    0m0.037s
+	user    0m0.026s
+	sys     0m0.008s
+
+  also works when searching the DESCRIPTION:
+  before:
+       time qsearch -S "unix.*clone" > /dev/null
+          real    0m0.595s
+          user    0m0.332s
+          sys     0m0.252s
+  after:
+       time ./q search -S "unix.*clone" > /dev/null
+          real    0m0.364s
+          user    0m0.101s
+          sys     0m0.257s
+# added and adapted patches from bug 172240
+
+
+== version 20070307 ==
+# added and adapted (for overlays) patches for the new qgrep options: --eclass and --skip-comments
+(from bugs: #170797 and #170795)
+
+== version 20070307 ==
+# add the average build time to the output of qlop --current
+
+== version 20070214 ==
+# add support for the q-initialize.conf file, in which you can disable the 
+cache regeneration (it's in /etc/paludis/hooks/config)
+# small fixes
+
+== version 20070210 ==
+# new level of verbosity for qlop, to print the total time
+  qlop -vtH x11-proto/scrnsaverproto-1.1.0::gentoo x11-terms/rxvt-unicode-8.1::gentoo
+   x11-proto/scrnsaverproto-1.1.0::gentoo : 5 seconds average for 1 merges
+   x11-terms/rxvt-unicode-8.1::gentoo : 49 seconds average for 1 merge
+   Total time: 54 seconds
+# new options for qlop --estimate (-e), ignore the version:
+  qlop  -vteH x11-proto/scrnsaverproto-1.1.0::gentoo x11-terms/rxvt-unicode-8.1::gentoo 
+   x11-proto/scrnsaverproto-1.1.0::gentoo : 5 seconds average for 1 merges
+   x11-terms/rxvt-unicode-8.1::gentoo : 48 seconds average for 2 merges
+   Total time: 53 seconds
+
+   =>TIP: to know how much time reinstalling world would take
+    1) qlop -tvH $(qlist -IC)
+     you can also play with qlist verbosity, to have something more or less accurate
+   
+    2) more accurate since it will check dependencies and so but...:
+       qlop -tvH $(paludis -ip --dl-reinstall always --log-level silent world | sed -e '/^\* .*::/!d' -e 's;^..\([^/]*/[^:]*::[^ ]* \).*;\1;')
+      but there are probably new packages;/version you've nvever installed yet, that's where the --estimate switch enter the game:)
+       qlop -etvH $(paludis -ip --dl-reinstall always --log-level silent world | sed -e '/^\* .*::/!d' -e 's;^..\([^/]*/[^:]*::[^ ]* \).*;\1;')
+
+== version 20070128 ==
+
+# portage-utils now also support the repository_defaults.conf file 
+it can read the cache, write_cache, and format keys
+# little fix in the 'palsearch' script
+
+
+
+== version 20070126 ==
+
+# fix a little bug with the 'profiles/categories' file. This new version also
+comes with a really small script: palsearch commented here:
+ http://tinyurl.com/youn2x
+
+
+
+== version 20070119 ==
+
+# when (re)generating the cache, portage-utils now consider the
+overlay/profiles/categories file, if this file doesn't exist, then it scan the
+content of the overlay, otherwise it will only add the categories specified in
+this file.
+
+# purge enhancement: if an ebuild cache file is deleted, and if the category
+doesn't contain anything else, then it is also deleted.
+
+
+
+== version 20070118 ==
+
+# more powerfull search can be achieved when searching with the name (ie not the DESCRIPTION):
+ * to list every package from one category, in the overlay that regexp
+ match pal.*a.$  :
+  qsearch sys-apps/::pal.*a.$
+   sys-apps/paludis::paludis-overlay paludis, the other package mangler
+   sys-apps/paludis-hooks::paludis-extras This is a colection of various hooks used with Paludis.
+
+ * Actually you can do almost what yo want, just think how qatom will split your
+ string
+
+ * note that doing 'qsearch -ao overlay' is faster than doing 'qsearch ::overlay',
+ but with the first one you have to know the exact name of the overlay, while with
+ the second you can do your search in every overaly but one, and so on.
+  eg: qsearch ::[^overlay]
+
+# little fix in qlop
+
+# added a purge use flag, if enable, you'll then have the option --purge,
+which will scan the cache paludis write (overlays with the key 'write_cache'
+defined):
+    * If an ebuild is no longer in the overlay then the ebuild cache is
+ deleted.
+    * It also regenerate the 'metacache' in the same time
+
+# the q-reinitialise.bash hook provided with portage-utils, which already
+reinitialise ebuild et meta cache, will now 'tell' paludis to write the cache 
+for every repository with 'write_cache' defined (and format=ebuild)
+
+
+
+
+== version 20070116 ==
+
+# added support for versions: -{live,cvs,svn,scm} which are equal (also equal to
+version -9999 for qatom
+# qatom is now also overlay aware:)
+ * e.g.:
+  qatom sys-apps/einit-9999-r3::einit
+  sys-apps einit 9999 r3 einit
+
+# for paludis users:  portage-utils will load the vdb location defined in
+etc/paludis/repositories/installed.conf instead of the hardcoded default
+location
+
+# modified qlist to reflect overlays existence (will work only for paludis
+users, with the REPOSITORY key in the VDB)
+e.g:
+ * before:
+  qlist -I
+  app-admin/conky
+  ..
+
+ * and:
+  qlist -Iv
+  app-admin/conky-1.4.5
+  ..
+
+ * now, we have one more level of verbosity:
+  qlist -Ivv
+  app-admin/conky-1.4.5::gentoo
+  ...
+
+ * where 'gentoo' is the overlay from which the package come from,
+ It works with the --installed, --umap, --slots and --dups options
+
+# qsearch should now be able to use the cache, portage users will only have the cache for the gentoo overlay
+while paludis users will have it whenever they defined it (key 'cache' or 'write_cache' in the
+repo conf files) 
+ * run q -l to list your defined overlays with their cache
+ * You can make more usefull search with the cache:
+ e.g.: To list and show the description of every package in a category just run:
+  qsearch -c category/
+
+ e.g.: To list and show the description of every package in a category in only 
+ the overlay 'overlay', just run:
+  qsearch -c category/::overlay
+
+
+# gentoo overlay is no longer required to use portage-utils.  
+=> .ebuild.x and .metadata.x default location is now (respectively)
+/var/cache/paludis/{,metadata}
+
+# possibility to defined CACHE_METADATA_FILE and/or CACHE_EBUILD_FILE
+environment variable to use different (from the default) cache files 
+
+# portage-utils now only recognise  the format=ebuild in the repository conf
+files
+
+# big changes in qlop, which now makes a better use of the atom, funny search
+can be perform now, 
+ * e.g.:
+  qlop -t portage -H
+  portage : 11 seconds average for 19 merges
+
+  qlop -t portage-2.1.2_rc4 -H
+  portage-2.1.2_rc4 : 13 seconds average for 8 merges
+
+ * To know how much time you've spent compiling things from the
+ paludis-overlay:
+  qlop  -tvH ::paludis-overlay
+  ::paludis-overlay : 20 minutes, 30 seconds average for 4 merges, for a total
+  time of 1 hour, 22 minutes, 3 seconds
+
+ * Or even how much time you've spent compiling things from the games-fps
+ category:
+  qlop  -tvH games-fps/
+  games-fps/ : 3 minutes, 5 seconds average for 14 merges, for a total time of
+  43 minutes, 21 seconds
+
+  
+
+TODO: fixe the tests for qatom... for paludis users (no python plz..:) <- fuck
+it... anyone?
+
+
+
+== prior versions ==
+
+A detail changelog was made in this post :
+http://forums.gentoo.org/viewtopic-p-3734846.html#3734846

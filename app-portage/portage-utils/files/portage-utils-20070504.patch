@@ -1,0 +1,47 @@
+diff -ur portage-utils-20070504.orig/libq/atom_explode.c portage-utils-20070504/libq/atom_explode.c
+--- portage-utils-20070504.orig/libq/atom_explode.c	2008-01-21 22:11:31.000000000 -0800
++++ portage-utils-20070504/libq/atom_explode.c	2008-01-22 13:15:33.000000000 -0800
+@@ -28,6 +28,7 @@
+ 
+ typedef struct {
+ 	char *OVERLAY;
++	char *SLOT;
+ 	char *CATEGORY;
+ 	char *PN;
+ 	int PR_int;
+@@ -84,6 +85,17 @@
+ 		ptr_tmp = NULL;
+ 	}
+ 
++	/* find the SLOT, if present */
++	if ((ptr_tmp=strstr(ret->CATEGORY, ":"))) {
++		if (*(ptr_tmp+1))
++			ret->SLOT = ptr_tmp + 1;
++		else
++			ret->SLOT = NULL;
++		*ptr_tmp = 0;
++		ptr_tmp = NULL;
++        }
++
++
+ 	/* break up the CATEOGRY and PVR */
+ 	if ((ptr = strrchr(ret->CATEGORY, '/')) != NULL) {
+ 		ret->PN = ptr+1;
+diff -ur portage-utils-20070504.orig/qlop.c portage-utils-20070504/qlop.c
+--- portage-utils-20070504.orig/qlop.c	2008-01-21 22:11:31.000000000 -0800
++++ portage-utils-20070504/qlop.c	2008-01-22 13:15:25.000000000 -0800
+@@ -185,7 +185,13 @@
+ 				/* "finished install of package" pkg up to 25 lines after the 'starting line' */
+ 				l=0;
+ 				snprintf(catPN, sizeof(catPN), "%s/%s", atom->CATEGORY, atom->PN);
+-				snprintf(catPNVo, sizeof(catPNVo), "%s/%s-%s::%s", atom->CATEGORY, atom->PN, (atom->PR_int ? atom->PVR : atom->PV), atom->OVERLAY);
++
++
++				if (!(atom->SLOT))  
++					snprintf(catPNVo, sizeof(catPNVo), "%s/%s-%s::%s", atom->CATEGORY, atom->PN, (atom->PR_int ? atom->PVR : atom->PV), atom->OVERLAY);
++				else
++					snprintf(catPNVo, sizeof(catPNVo), "%s/%s-%s:%s::%s", atom->CATEGORY, atom->PN, (atom->PR_int ? atom->PVR : atom->PV), atom->SLOT, atom->OVERLAY);
++
+ 				while ((fgets(buf[0], sizeof(buf[0]), fp)) != NULL && l++ < 25) {
+ 					if ((p = strchr(buf[0],':')) == NULL)
+ 						continue;
