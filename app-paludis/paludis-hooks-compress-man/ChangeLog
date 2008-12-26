@@ -1,9 +1,0 @@
-# ChangeLog for app-paludis/paludis-hooks-compress-man
-# Distributed under the GPL v2
-# $Header: $
-
-2008-01-12 ver 1.2-r1 : bugfix by mereandor
-2007-12-17 ~x86-fbsd keyworded
-2007-04-01 ver 1.2 : einfo changed to einfo_unhooked, so the einfo lines don't get logged
-2007-03-12 ver 1.1 : updated for eselect support. Hook is now symlinked from /common/ folder.
-2007-03-07 Initial entry - version 1.0
