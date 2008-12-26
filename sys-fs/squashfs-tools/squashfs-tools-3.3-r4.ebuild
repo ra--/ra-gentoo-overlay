@@ -81,7 +81,7 @@ src_compile() {
 		cd ${WORKDIR}
 	fi
 
-        emake CC="$(tc-getCC)" || die
+	emake CC="$(tc-getCC)" || die
 }
 
 src_install() {
