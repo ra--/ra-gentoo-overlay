@@ -28,12 +28,11 @@ LICENSE="GPL-2"
 
 SLOT="0"
 
-IUSE="paludis_hooks_eselect"
+IUSE=""
 
 VERSION="-${NEED_PALUDIS:-0.24.0}"
 
-DEPEND=">=sys-apps/paludis${VERSION}
-		paludis_hooks_eselect? ( app-admin/eselect-paludis-hooks )"
+DEPEND=">=sys-apps/paludis${VERSION}"
 
 RDEPEND="${DEPEND}"
 
@@ -53,41 +52,15 @@ dohook() {
 	dodir "${hooksdir}/common" || die "dodir failed"
 	exeinto "${hooksdir}/common" || die "exeinto failed"
 	doexe "${hookfile}" || die "doins failed"
-	if use paludis_hooks_eselect ; then
-		echo "# eselect definition file for ${P}" >> ${esf}
-		echo "common/${hookname} ${@}" >> ${esf}
-
-		insinto "${hooksdir}/eselect" || die "insinto failed"
-		doins "${esf}" || die "doins failed"
-	else
-		for hooktype in "$@"; do
-			dodir "${hooksdir}/${hooktype}" || die "dodir failed"
-			dosym "${hooksdir}/common/${hookname}" "${hooksdir}/${hooktype}" || die "dosym failed"
-		done
-	fi
+	for hooktype in "$@"; do
+		dodir "${hooksdir}/${hooktype}" || die "dodir failed"
+		dosym "${hooksdir}/common/${hookname}" "${hooksdir}/${hooktype}" || die "dosym failed"
+	done
 }
 
 dohookconf() {
 	insinto "/etc/paludis/hooks/config" || die "insinto failed"
 	doins "${1}" || die "doins failed"
-}
-
-paludis-hooks-disable() {
-	einfo "Using eselect to disable the hook: ${HOOK_NAME}"
-	eselect paludis-hook disable "${HOOK_NAME}" || die "eselect disable failed"
-}
-
-paludis-hooks-enable() {
-	einfo "Using eselect to enable the hook: ${HOOK_NAME}"
-	eselect paludis-hook enable "${HOOK_NAME}" || die "eselect enable failed"
-}
-
-paludis-hooks-get-status() {
-	if [[ "$(eselect paludis-hook list | grep -c "${HOOK_NAME}.*enabled")" != "0" ]]; then
-		HOOK_STATUS="enabled"
-	elif [[ "$(eselect paludis-hook list | grep -c "${HOOK_NAME}.*disabled")" != "0" ]]; then
-		HOOK_STATUS="disabled"
-	fi
 }
 
 paludis-hooks-clean-symlinks() {
@@ -115,35 +88,14 @@ paludis-hooks_pkg_setup() {
 	ewarn "If paludis reports errors with hooks and fails, simply resuming"
 	ewarn "the interrupted installation should fix the problem."
 	ewarn "We apologize for the inconvenience."
-	if use paludis_hooks_eselect ; then
-		paludis-hooks-get-status
-		if [[ "${HOOK_STATUS}" == "enabled" ]]; then
-			paludis-hooks-disable
-		fi
-		if [[ -n "${HOOK_STATUS}" ]]; then
-			HOOK_INSTALLED="true"
-		fi
-	fi
 	paludis-hooks-clean-symlinks
 }
 
 paludis-hooks_pkg_postinst() {
-	if use paludis_hooks_eselect && \
-		[[ "${HOOK_STATUS}" != "disabled" ]]; then
-		paludis-hooks-enable
-	fi
 	paludis-hooks-clean-symlinks
 }
 
 paludis-hooks_pkg_prerm() {
-	if use paludis_hooks_eselect ; then
-		if [[ -z "${HOOK_INSTALLED}" ]];then
-			paludis-hooks-get-status
-			if [[ "${HOOK_STATUS}" == "enabled" ]]; then
-				paludis-hooks-disable
-			fi
-		fi
-	fi
 	paludis-hooks-clean-symlinks
 }
 
