@@ -6,16 +6,19 @@
 # --------------------------------------
 # pilx
 
-inherit eutils paludis-hooks
-
 DESCRIPTION="Sends Paludis elog messages via email."
 
 KEYWORDS="~amd64 ~x86 ~sparc"
 
-DEPEND=''
-RDEPEND=''
+DEPEND='sys-apps/paludis'
+RDEPEND="${DEPEND}"
 IUSE=''
+SLOT='0'
 
+src_unpack() {
+	cd "${WORKDIR}"
+	tar xfj "${FILESDIR}"/"${PN}"-"${PV}".tar.bz2 || die
+}
 
 src_install() {
 	dodir /etc/paludis/hooks/config
@@ -24,7 +27,22 @@ src_install() {
 
 	dodir /usr/share/paludis/hooks/common
 	exeinto /usr/share/paludis/hooks/common || die "log-mailer-send.py: exeinto failed"
-	doexe log-mailer-send.py || die "log-mailer.py: doexe failed"
+	doexe log-mailer-send.py || die "log-mailer-send.py: doexe failed"
+	doexe log-mailer.bash || die "log-mailer.bash: doexe failed"
 
-	dohook log-mailer.bash elog einfo ewarn eerror install_post
+	local hookfile="log-mailer.bash"
+	local hookname="${hookfile##*/}"
+	local hooksdir="/usr/share/paludis/hooks"
+	local esdfn="${PN##*paludis-hooks-}"
+	local esf="${WORKDIR}/${esdfn}"
+	dodir "${hooksdir}/elog" || die "dodir failed"
+	dosym "${hooksdir}/common/${hookname}" "${hooksdir}"/elog || die "dosym failed"
+	dodir "${hooksdir}/einfo" || die "dodir failed"
+	dosym "${hooksdir}/common/${hookname}" "${hooksdir}"/einfo || die "dosym failed"
+	dodir "${hooksdir}/ewarn" || die "dodir failed"
+	dosym "${hooksdir}/common/${hookname}" "${hooksdir}"/ewarn || die "dosym failed"
+	dodir "${hooksdir}/eerror" || die "dodir failed"
+	dosym "${hooksdir}/common/${hookname}" "${hooksdir}"/eerror || die "dosym failed"
+	dodir "${hooksdir}/install_post" || die "dodir failed"
+	dosym "${hooksdir}/common/${hookname}" "${hooksdir}"/install_post || die "dosym failed"
 }
