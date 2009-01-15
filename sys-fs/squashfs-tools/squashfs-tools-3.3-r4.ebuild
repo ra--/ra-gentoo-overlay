@@ -1,4 +1,4 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -9,7 +9,7 @@ SQUASH_PV="squashfs${PV}"
 LZMA_PV="lzma457"
 SQLZMA_PV="sqlzma${PV}-${LZMA_PV/#lzma}-2"
 
-DESCRIPTION="Tool for creating compressed filesystem type squashfs" 
+DESCRIPTION="Tool for creating compressed filesystem type squashfs"
 HOMEPAGE="http://squashfs.sourceforge.net http://www.squashfs-lzma.org"
 SRC_URI="mirror://sourceforge/squashfs/${SQUASH_PV}.tar.gz
 	lzma? (	mirror://sourceforge/sevenzip/${LZMA_PV}.tar.bz2
@@ -32,13 +32,13 @@ pkg_setup() {
 		eerror
 		die "Upgrade kernel"
 	fi
-	
+
 	append-ldflags -Wl,--no-as-needed
 }
 
 src_unpack() {
-	cd ${WORKDIR}
-	unpack ${SQUASH_PV}.tar.gz || die
+	cd "${WORKDIR}"
+	unpack "${SQUASH_PV}".tar.gz || die
 
 	if use lzma ; then
 		unpack ${SQLZMA_PV}.tar.bz2 || die
@@ -63,7 +63,7 @@ src_unpack() {
 		# adjust cflags
 		sed -i "s:-O2:${CFLAGS}:" ${LZMA_PV}/C/Compress/Lzma/sqlzma.mk || die
 		sed -i "s:-O2:${CFLAGS}:" ${LZMA_PV}/CPP/7zip/Compress/LZMA_Alone/makefile.gcc || die
-		
+
 		# adjust Makefile
 		sed -i "s:KDir =:# KDir =:" Makefile || die # kernel dir unneeded
 		sed -i "s:BuildSquashfs =:# BuildSquashfs =:" Makefile || die	# dont build modules
@@ -72,13 +72,13 @@ src_unpack() {
 
 	# adjust cflags
 	sed -i "s:-O2:${CFLAGS}:" ${SQUASH_PV}/squashfs-tools/Makefile || die
-} 
+}
 
 src_compile() {
 	if ! use lzma ; then
-		cd ${WORKDIR}/${SQUASH_PV}/squashfs-tools
+		cd "${WORKDIR}"/"${SQUASH_PV}"/squashfs-tools
 	else
-		cd ${WORKDIR}
+		cd "${WORKDIR}"
 	fi
 
 	emake CC="$(tc-getCC)" || die
@@ -88,7 +88,7 @@ src_install() {
 	cd ${SQUASH_PV}/squashfs-tools
 	dobin mksquashfs unsquashfs || die
 	cd ..
-	dodoc README ACKNOWLEDGEMENTS CHANGES COPYING PERFORMANCE.README README-3.3
+	dodoc README ACKNOWLEDGEMENTS CHANGES PERFORMANCE.README README-3.3
 	cd ..
 	use lzma && dodoc sqlzma.txt
 }

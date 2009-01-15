@@ -1,4 +1,4 @@
-# Copyright
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -11,6 +11,11 @@ inherit eutils paludis-hooks
 DESCRIPTION="Sends Paludis elog messages via email."
 
 KEYWORDS="~amd64 ~x86 ~sparc"
+
+DEPEND=''
+RDEPEND=''
+IUSE=''
+
 
 src_install() {
 	dodir /etc/paludis/hooks/config

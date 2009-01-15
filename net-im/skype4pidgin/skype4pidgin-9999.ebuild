@@ -1,4 +1,4 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -7,7 +7,7 @@ inherit subversion
 DESCRIPTION="Skype API PLugin for Pidgin"
 HOMEPAGE="http://myjobspace.co.nz/images/pidgin/"
 ESVN_REPO_URI="http://skype4pidgin.googlecode.com/svn/trunk/"
-LICENSE="GPL-2 CCPL-Attribution-Noncommercial-ShareAlike-3.0"
+LICENSE="GPL-2 CCPL-Attribution-ShareAlike-NonCommercial-2.5"
 KEYWORDS="~amd64 ~x86"
 IUSE="dbus nls"
 SLOT="0"
@@ -31,14 +31,14 @@ src_compile() {
 
 	CFLAGS="${CFLAGS} ${LIBPURPLE_CFLAGS} -Wall -pthread ${GLIB_CFLAGS} -I.
 	-shared -fPIC -DPIC"
-	
+
 	cc ${CFLAGS} -o libskype.so libskype.c || die 'Error compiling library!'
 	cc ${CFLAGS} -DSKYPENET -o libskypenet.so libskype.c || die 'Error compiling library!'
 	#cc ${CFLAGS} -m32 -m64 -o libskype64.so libskype.c || die 'Error compiling library!'
 	#cc ${CFLAGS} -DSKYPENET -m32 -m64 -o libskypenet64.so libskype.c || die 'Error compiling library!'
-	
+
 	if use dbus; then
-		DBUS_CFLAGS="-DSKYPE_DBUS -I/usr/include/dbus-1.0 
+		DBUS_CFLAGS="-DSKYPE_DBUS -I/usr/include/dbus-1.0
 		-I/usr/lib/dbus-1.0/include -o libskype_dbus.so"
 		cc ${CFLAGS} ${DBUS_CFLAGS} -o libskype_dbus.so libskype.c || die 'Error compiling library!'
 		#cc ${CFLAGS} ${DBUS_CFLAGS} -m32 -m64 -o libskype_dbus64.so libskype.c || die 'Error compiling library!'
@@ -58,7 +58,7 @@ src_install() {
 
 	insinto /usr/share/pixmaps/pidgin/emotes/default-skype
 	doins "theme"
-	
+
 	cd icons
 	insinto /usr/share/pixmaps/pidgin/protocols/
 	doins -r ??

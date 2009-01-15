@@ -1,4 +1,4 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -22,7 +22,7 @@ DEPEND="cups? ( net-print/cups
 
 src_unpack() {
 	unpack ${A}
-	cd ${S}
+	cd "${S}"
 	gnuconfig_update
 }
 
@@ -32,7 +32,7 @@ src_compile () {
 }
 
 src_install() {
-	make DESTDIR=${D} install || die
+	make DESTDIR="${D}" install || die
 }
 
 pkg_postinst() {

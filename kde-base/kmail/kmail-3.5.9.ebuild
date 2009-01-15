@@ -1,4 +1,4 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/kde-base/kmail/kmail-3.5.9.ebuild,v 1.8 2008/05/18 22:04:26 maekke Exp $
 
@@ -61,7 +61,7 @@ KMCOMPILEONLY="libemailfunctions"
 KMEXTRA="plugins/kmail/
 	kontact/plugins/kmail/" # We add here the kontact's plugin instead of compiling it with kontact because it needs a lot of this programs deps.
 
-PATCHES="${FILESDIR}/kmfilteraction.diff"
+PATCHES=("${FILESDIR}/kmfilteraction.diff")
 
 src_install() {
 	kde-meta_src_install

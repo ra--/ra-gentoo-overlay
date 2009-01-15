@@ -1,4 +1,4 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/net-misc/networkmanager/networkmanager-0.6.6.ebuild,v 1.1 2008/03/07 09:27:02 steev Exp $
 
@@ -63,7 +63,7 @@ src_unpack () {
 	cd "${S}"
 
 	# Use the kernel headers
-	epatch "${FILESDIR}/${PN}-use-kernel-headers.patch"
+#	epatch "${FILESDIR}/${PN}-use-kernel-headers.patch"
 	# Fix the resolv.conf permissions
 	epatch "${FILESDIR}/${PN}-resolvconf-perms.patch"
 	# Fix up the dbus conf file to use plugdev group

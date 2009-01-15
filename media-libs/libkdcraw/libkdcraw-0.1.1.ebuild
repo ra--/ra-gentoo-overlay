@@ -1,4 +1,4 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/media-libs/libkdcraw/libkdcraw-0.1.1.ebuild,v 1.5 2007/09/30 13:10:15 pylon Exp $
 

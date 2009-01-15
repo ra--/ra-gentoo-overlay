@@ -1,4 +1,4 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-apps/paludis/paludis-0.30.1.ebuild,v 1.1 2008/09/25 22:13:59 betelgeuse Exp $
 
@@ -67,9 +67,9 @@ pkg_setup() {
 src_unpack() {
 	unpack ${A}
 	cd "${S}"
-	epatch ${FILESDIR}/paludis-stderr.patch;
-	epatch ${FILESDIR}/paludis-loglevel.patch;
-	epatch ${FILESDIR}/reconcilio-log.patch;
+	epatch "${FILESDIR}"/paludis-stderr.patch;
+	epatch "${FILESDIR}"/paludis-loglevel.patch;
+	epatch "${FILESDIR}"/reconcilio-log.patch;
 }
 
 src_compile() {

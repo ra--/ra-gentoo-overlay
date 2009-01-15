@@ -1,4 +1,4 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -7,7 +7,8 @@ inherit eutils
 MY_P="tr-2.0.1"
 DESCRIPTION="Java-based Getting Things Done (GTD) application"
 HOMEPAGE="http://thinkingrock.com.au/"
-SRC_URI="http://mesh.dl.sourceforge.net/sourceforge/thinkingrock/${MY_P}.tar.gz"
+#SRC_URI="http://mesh.dl.sourceforge.net/sourceforge/thinkingrock/${MY_P}.tar.gz"
+SRC_URI="mirror://sourceforge/thinkingrock/${MY_P}.tar.gz"
 
 LICENSE="CDDL"
 SLOT="0"
@@ -20,9 +21,9 @@ DEPEND="${DEPEND}"
 S=${WORKDIR}/${MY_P}
 
 src_unpack() {
-        unpack ${A}
-        cd "${S}"
-        epatch "${FILESDIR}"/tr.patch
+	unpack ${A}
+	cd "${S}"
+	epatch "${FILESDIR}"/tr.patch
 }
 
 src_install() {

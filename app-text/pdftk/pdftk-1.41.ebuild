@@ -1,4 +1,4 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/app-text/pdftk/pdftk-1.41.ebuild,v 1.1 2007/05/07 09:29:31 genstef Exp $
 
@@ -25,9 +25,9 @@ pkg_setup() {
 src_unpack() {
 	unpack ${A}
 	# force usage of custom CFLAGS.
-	mv ${S}/Makefile.Generic ${T}/Makefile.Generic.orig
+	mv "${S}"/Makefile.Generic "${T}"/Makefile.Generic.orig
 	sed 's:-O2:\$(CFLAGS):g' \
-		< ${T}/Makefile.Generic.orig > ${S}/Makefile.Generic
+		< "${T}"/Makefile.Generic.orig > "${S}"/Makefile.Generic
 }
 
 src_compile() {

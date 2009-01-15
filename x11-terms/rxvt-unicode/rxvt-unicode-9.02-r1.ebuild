@@ -1,4 +1,4 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/x11-terms/rxvt-unicode/rxvt-unicode-9.02-r1.ebuild,v 1.6 2008/05/05 20:19:41 maekke Exp $
 
@@ -38,11 +38,11 @@ src_unpack() {
 	epatch "${FILESDIR}/${P}-CVE-2008-1142-DISPLAY.patch"
 
 	sed -i -e \
-		"s~@TIC@ \(\$(srcdir)/etc/rxvt\)~@TIC@ -o ${D}/${tdir} \1~" \
+		"s~@TIC@ \(\$(srcdir)/etc/rxvt\)~@TIC@ -o "${D}"/${tdir} \1~" \
 		doc/Makefile.in
-	
+
 	if use singlelinescroll; then
-		epatch ${FILESDIR}/scrolling-one-line.patch;
+		epatch "${FILESDIR}"/scrolling-one-line.patch;
 	fi
 }
 
