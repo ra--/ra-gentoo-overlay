@@ -70,6 +70,7 @@ src_unpack() {
 	epatch "${FILESDIR}"/paludis-stderr.patch;
 	epatch "${FILESDIR}"/paludis-loglevel.patch;
 	epatch "${FILESDIR}"/reconcilio-log.patch;
+	epatch "${FILESDIR}"/dogit.patch;
 }
 
 src_compile() {

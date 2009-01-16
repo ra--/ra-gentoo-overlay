@@ -1,0 +1,30 @@
+--- a/paludis/syncers/dogit	2009-01-15 03:02:12.000000000 +0100
++++ b/paludis/syncers/dogit	2009-01-16 03:33:50.000000000 +0100
+@@ -14,6 +14,7 @@
+ 
+ GIT_CLONE_OPTIONS=( )
+ GIT_PULL_OPTIONS=( )
++GIT_BRANCH='origin'
+ 
+ while [[ $# -gt 0 ]]; do
+     case "${1}" in
+@@ -26,6 +27,10 @@
+             GIT_PULL_OPTIONS[${#GIT_PULL_OPTIONS[@]}]="${1#*=}"
+             ;;
+ 
++	--branch=*)
++	    GIT_BRANCH="${1#*=}"
++	    ;;
++
+         --help)
+             PROTO="${0##*/do}"
+             if [[ "${PROTO}" == git ]]; then
+@@ -99,7 +104,7 @@
+ fi
+ 
+ if [[ -d "${LOCAL}/.git" ]]; then
+-    cd "${LOCAL}" && ${GIT_WRAPPER} git pull "${GIT_PULL_OPTIONS[@]}" origin
++    cd "${LOCAL}" && ${GIT_WRAPPER} git pull "${GIT_PULL_OPTIONS[@]}" "${GIT_BRANCH}"
+ else
+     ${GIT_WRAPPER} git clone "${GIT_CLONE_OPTIONS[@]}" "${REMOTE}" "${LOCAL}"
+ fi
