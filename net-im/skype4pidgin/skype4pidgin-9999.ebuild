@@ -32,16 +32,17 @@ src_compile() {
 	CFLAGS="${CFLAGS} ${LIBPURPLE_CFLAGS} -Wall -pthread ${GLIB_CFLAGS} -I.
 	-shared -fPIC -DPIC"
 
+	if use amd64; then
+		CFLAGS="${CFLAGS} -m32 -m64"
+	fi
+
 	cc ${CFLAGS} -o libskype.so libskype.c || die 'Error compiling library!'
 	cc ${CFLAGS} -DSKYPENET -o libskypenet.so libskype.c || die 'Error compiling library!'
-	#cc ${CFLAGS} -m32 -m64 -o libskype64.so libskype.c || die 'Error compiling library!'
-	#cc ${CFLAGS} -DSKYPENET -m32 -m64 -o libskypenet64.so libskype.c || die 'Error compiling library!'
 
 	if use dbus; then
 		DBUS_CFLAGS="-DSKYPE_DBUS -I/usr/include/dbus-1.0
 		-I/usr/lib/dbus-1.0/include -o libskype_dbus.so"
 		cc ${CFLAGS} ${DBUS_CFLAGS} -o libskype_dbus.so libskype.c || die 'Error compiling library!'
-		#cc ${CFLAGS} ${DBUS_CFLAGS} -m32 -m64 -o libskype_dbus64.so libskype.c || die 'Error compiling library!'
 	fi
 }
 
@@ -49,11 +50,8 @@ src_install() {
 	insinto /usr/lib/purple-2
 	doins "libskype.so"
 	doins "libskypenet.so"
-	#doins "libskype64.so"
-	#doins "libskype64.so"
 	if use dbus; then
 		doins "libskype_dbus.so"
-		#doins "libskype_dbus64.so"
 	fi
 
 	insinto /usr/share/pixmaps/pidgin/emotes/default-skype
