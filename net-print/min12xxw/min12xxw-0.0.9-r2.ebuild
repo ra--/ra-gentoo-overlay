@@ -11,7 +11,7 @@ SRC_URI="http://www.hinterbergen.de/mala/min12xxw/${P}.tar.gz"
 SLOT="0"
 IUSE="cups ppds"
 LICENSE="GPL-2"
-KEYWORDS="x86 ~ppc ~alpha ~sparc ~hppa amd64"
+KEYWORDS="~x86 ~ppc ~alpha ~sparc ~hppa ~amd64"
 
 # To be able to print with CUPS, we _need_ the PPD, so let foomatic-filters-ppds
 # depend on 'cups' USE flag, not on 'ppds' ... but if set, install PPDS anyway
