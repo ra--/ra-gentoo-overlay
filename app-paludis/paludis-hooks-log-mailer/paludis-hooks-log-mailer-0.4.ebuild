@@ -9,6 +9,8 @@
 DESCRIPTION="Sends Paludis elog messages via email."
 
 KEYWORDS="~amd64 ~x86 ~sparc"
+HOMEPAGE=""
+LICENSE=""
 
 DEPEND='sys-apps/paludis'
 RDEPEND="${DEPEND}"
