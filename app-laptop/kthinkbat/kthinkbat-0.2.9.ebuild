@@ -1,6 +1,6 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-laptop/kthinkbat/kthinkbat-0.2.9.ebuild,v 1.2 2008/06/26 23:13:51 dirtyepic Exp $
+# $Header: 
 
 EAPI=1
 
@@ -33,7 +33,7 @@ pkg_postinst() {
 	elog "the kernel module tp_smapi (from app-laptop/tp_smapi)"
 	elog "loaded."
 	elog
-	elog "To autoload this kernel module at system startup add it to" 
+	elog "To autoload this kernel module at system startup add it to"
 	elog "/etc/conf.d/modules or /etc/modules.autoload.d/kernel-2.6"
 	elog
 
