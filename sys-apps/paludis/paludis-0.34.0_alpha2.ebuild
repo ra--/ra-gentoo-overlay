@@ -8,7 +8,7 @@ DESCRIPTION="paludis, the other package mangler"
 HOMEPAGE="http://paludis.pioto.org/"
 SRC_URI="http://paludis.pioto.org/download/${P}.tar.bz2"
 
-IUSE="doc glsa inquisitio portage pink python qa ruby vim-syntax zsh-completion visibility"
+IUSE="doc inquisitio portage pink python-bindings qa ruby-bindings vim-syntax visibility xml zsh-completion"
 LICENSE="GPL-2 vim-syntax? ( vim )"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86"
@@ -17,24 +17,22 @@ COMMON_DEPEND="
 	>=app-admin/eselect-1.0.2
 	>=app-admin/eselect-news-20071201
 	>=app-shells/bash-3
-	qa? ( dev-libs/pcre++ >=dev-libs/libxml2-2.6 app-crypt/gnupg )
 	inquisitio? ( dev-libs/pcre++ )
-	glsa? ( >=dev-libs/libxml2-2.6 )
-	ruby? ( >=dev-lang/ruby-1.8 )
-	python? ( >=dev-lang/python-2.4 >=dev-libs/boost-1.33.1-r1 )"
+	python-bindings? ( >=dev-lang/python-2.4 >=dev-libs/boost-1.33.1-r1 )
+	qa? ( dev-libs/pcre++ >=dev-libs/libxml2-2.6 app-crypt/gnupg )
+	ruby-bindings? ( >=dev-lang/ruby-1.8 )
+	xml? ( >=dev-libs/libxml2-2.6 )"
 
 DEPEND="${COMMON_DEPEND}
 	doc? (
 		|| ( >=app-doc/doxygen-1.5.3 <=app-doc/doxygen-1.5.1 )
 		media-gfx/imagemagick
+		python-bindings? ( dev-python/epydoc dev-python/pygments )
+		ruby-bindings? ( dev-ruby/syntax dev-ruby/allison )
 	)
-	python? ( doc? ( dev-python/epydoc dev-python/pygments ) )
-	ruby? ( doc? ( dev-ruby/syntax dev-ruby/allison ) )
 	dev-util/pkgconfig"
 
 RDEPEND="${COMMON_DEPEND}
-	net-misc/wget
-	net-misc/rsync
 	sys-apps/sandbox"
 
 # Keep this as a PDEPEND. It avoids issues when Paludis is used as the
@@ -44,24 +42,13 @@ PDEPEND="
 
 PROVIDE="virtual/portage"
 
-pkg_setup() {
-	replace-flags -Os -O2
-	replace-flags -O3 -O2
-
+create-paludis-user() {
 	enewgroup "paludisbuild"
 	enewuser "paludisbuild" "-1" "-1" "/var/tmp/paludis" "paludisbuild"
+}
 
-	FIXED_MAKEOPTS=""
-	m=$(free -m | sed -n -e '/cache:/s,^[^[:digit:]]\+[[:digit:]]\+[^[:digit:]]\+\([[:digit:]]\+\).*,\1,p')
-	j=$(echo "$MAKEOPTS" | sed -n -e 's,.*-j\([[:digit:]]\+\).*,\1,p' )
-	if [[ -n "${m}" ]] && [[ -n "${j}" ]] && (( ${j} > 1 )); then
-		if (( m < j * 512 )) ; then
-			FIXED_MAKEOPTS="-j$(( m / 512 ))"
-			[[ ${FIXED_MAKEOPTS} == "-j0" ]] && FIXED_MAKEOPTS="-j1"
-			ewarn "Your MAKEOPTS -j is too high. To stop the kernel from throwing a hissy fit"
-			ewarn "when g++ eats all your RAM, we'll use ${FIXED_MAKEOPTS} instead."
-		fi
-	fi
+pkg_setup() {
+	create-paludis-user
 }
 
 src_unpack() {
@@ -75,18 +62,18 @@ src_unpack() {
 
 src_compile() {
 	local repositories=`echo default unpackaged | tr -s \  ,`
-	local clients=`echo default accerso adjutrix contrarius importare \
+	local clients=`echo default accerso adjutrix importare \
 		$(usev inquisitio ) instruo paludis reconcilio | tr -s \  ,`
 	local environments=`echo default $(usev portage ) | tr -s \  ,`
 	econf \
 		$(use_enable doc doxygen ) \
 		$(use_enable pink ) \
 		$(use_enable qa ) \
-		$(use_enable ruby ) \
-		$(useq ruby && useq doc && echo --enable-ruby-doc ) \
-		$(use_enable python ) \
-		$(useq python && useq doc && echo --enable-python-doc ) \
-		$(use_enable glsa ) \
+		$(use_enable ruby-bindings ruby ) \
+		$(useq ruby-bindings && useq doc && echo --enable-ruby-doc ) \
+		$(use_enable python-bindings python ) \
+		$(useq python-bindings && useq doc && echo --enable-python-doc ) \
+		$(use_enable xml ) \
 		$(use_enable vim-syntax vim ) \
 		$(use_enable visibility ) \
 		--with-vim-install-dir=/usr/share/vim/vimfiles \
@@ -106,7 +93,6 @@ src_install() {
 	BASH_COMPLETION_NAME="adjutrix" dobashcompletion bash-completion/adjutrix
 	BASH_COMPLETION_NAME="paludis" dobashcompletion bash-completion/paludis
 	BASH_COMPLETION_NAME="accerso" dobashcompletion bash-completion/accerso
-	BASH_COMPLETION_NAME="contrarius" dobashcompletion bash-completion/contrarius
 	BASH_COMPLETION_NAME="importare" dobashcompletion bash-completion/importare
 	BASH_COMPLETION_NAME="instruo" dobashcompletion bash-completion/instruo
 	BASH_COMPLETION_NAME="reconcilio" dobashcompletion bash-completion/reconcilio
@@ -133,7 +119,18 @@ src_test() {
 	export PALUDIS_DO_NOTHING_SANDBOXY="portage sucks"
 	export BASH_ENV=/dev/null
 
-	emake check || die "Make check failed"
+	if [[ `id -u` == 0 ]] ; then
+		export PALUDIS_REDUCED_UID=0
+		export PALUDIS_REDUCED_GID=0
+	fi
+
+	if ! emake check ; then
+		eerror "Tests failed. Looking for file for you to add to your bug report..."
+		find "${S}" -type f -name '*.epicfail' -or -name '*.log' | while read a ; do
+			eerror "	$a"
+		done
+		die "Make check failed."
+	fi
 }
 
 pkg_postinst() {
