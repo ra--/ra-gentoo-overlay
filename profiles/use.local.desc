@@ -4,9 +4,6 @@
 # This file contains descriptions of local USE flags, and the ebuilds which
 # contain them.
 
-gnome-extra/nm-applet:cisco - Add support for vpnc
-gnome-extra/nm-applet:openvpn - Add openvpn support
 sys-apps/paludis:glsa - Add support for GLSA
 sys-boot/grub:tpm - Add support for TPM
 sys-fs/squashfs:lzma - Add lzma support
-x11-terms/rxvt-unicode:singlelinescroll - Add <Shift>+Up/Down single line scrolling
