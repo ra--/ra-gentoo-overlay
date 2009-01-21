@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-laptop/hdapsd/hdapsd-20081005.ebuild,v 1.1 2008/10/20 08:45:26 welp Exp $
+# $Header: 
 
 inherit eutils linux-info
 
@@ -20,7 +20,7 @@ RDEPEND=">=app-laptop/tp_smapi-0.32"
 
 S="${WORKDIR}"
 
-src_compile() {
+pkg_setup() {
 	# We require the hdaps module; problem is that it can come from either
 	# kernel sources or from the tp_smapi package. This hack is required because
 	# the linux-info eclass doesn't export any more suitable config checkers.
@@ -29,11 +29,12 @@ src_compile() {
 
 	if ! has_version app-laptop/tp_smapi || ! built_with_use app-laptop/tp_smapi hdaps; then
 		CONFIG_CHECK="SENSORS_HDAPS"
-		ERROR_SENSORS_HDAPS="${P} requires support for HDAPS (CONFIG_SENSORS_HDAPS)"
+		ERROR_SENSORS_HDAPS="${P} requires support for HDAPS (CONFIG_SENSORS_HDAPS or app-laptop/tp_smapi)"
 		linux-info_pkg_setup
 	fi
+}
 
-	cd "${WORKDIR}"
+src_compile() {
 	gcc ${CFLAGS} "${P}".c -o hdapsd || die "failed to compile"
 }
 
@@ -42,63 +43,15 @@ src_install() {
 	newconfd "${FILESDIR}"/hdapsd.conf hdapsd
 	newinitd "${FILESDIR}"/hdapsd.init hdapsd
 
-	# Install our kernel patches
-	dodoc *.patch "${FILESDIR}"/hdaps-Z60m.patch
-
 	# Install udev file
 	insinto /etc/udev/rules.d/
 	newins "${FILESDIR}"/51-hdaps.rules 51-hdaps.rules
 }
 
-# Yes, this sucks as the source location may change, kernel sources may not be
-# installed, but we try our best anyway
-kernel_patched() {
-	get_version
-
-	if grep -qs "blk_protect_register" "${KERNEL_DIR}"/block/ll_rw_blk.c ; then
-		einfo "Your kernel has already been patched for blk_freeze"
-		return 0
-	fi
-
-	return 1
-}
-
-pkg_config() {
-	kernel_patched && return 0
-
-	local docdir="${ROOT}/usr/share/doc/${PF}/"
-	local p="hdaps_protect-${KV_MAJOR}.${KV_MINOR}.${KV_PATCH}.patch.gz"
-
-	# We need to find our FILESDIR as it's now lost
-	if [[ ! -e ${docdir}/${p} ]] ; then
-		eerror "We don't have a patch for kernel ${KV_MAJOR}.${KV_MINOR}.${KV_PATCH} yet"
-		return 1
-	fi
-
-	if [[ ! -d ${KERNEL_DIR} ]] ; then
-		eerror "Kernel sources not found!"
-		return 1
-	fi
-
-	cd "${KERNEL_DIR}"
-	epatch "${docdir}/${p}"
-
-	# This is just a nice to have for me as I use a Z60m myself
-	if ! grep -q "Z60m" "${KERNEL_DIR}"/drivers/hwmon/hdaps.c ; then
-		epatch "${docdir}"/hdaps-Z60m.patch.gz
-	fi
-
-	echo
-	einfo "Now you should rebuild your kernel, its modules"
-	einfo "and then install them."
-}
-
 pkg_postinst(){
-	[[ -n $(ls "${ROOT}"/sys/block/*/queue/protect 2>/dev/null) ]] && return 0
+	[[ -z $(ls "${ROOT}"/sys/block/*/queue/protect 2>/dev/null) ]] && \
+	[[ -z $(ls "${ROOT}"/sys/block/*/device/unload_heads 2>/dev/null) ]] && \
+		ewarn "Your kernel has NOT been patched for blk_freeze!"
 
-	if ! kernel_patched ; then
-		ewarn "Your kernel has NOT been patched for blk_freeze"
-		elog "The ebuild can attempt to patch your kernel like so"
-		elog "   emerge --config =${PF}"
-	fi
+	elog "You can change the default frequency by modifing /sys/devices/platform/hdaps/sampling_rate"
 }
