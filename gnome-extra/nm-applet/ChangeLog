@@ -1,0 +1,109 @@
+# ChangeLog for gnome-extra/nm-applet
+# Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
+# $Header:
+
+  18 Jan 2009; Robert A <r_a@lavabit.com>
+  nm-applet-0.6.6.ebuild, nm-applet-0.7.0.ebuild added cisco and openvpn use
+  flags, deleted unnecessary use flags and dependencies and added more postinst
+  information.
+
+*nm-applet-0.7.0 (05 Dec 2008)
+
+  05 Dec 2008; Robert Buchholz <rbu@gentoo.org>
+  +files/nm-applet-0.7.0-confchanges.patch, metadata.xml,
+  +nm-applet-0.7.0.ebuild:
+  Version bump, bug #235330
+
+  17 Aug 2008; Markus Meier <maekke@gentoo.org> nm-applet-0.6.6.ebuild:
+  x86 stable, bug #228837
+
+  28 Jul 2008; Kenneth Prugh <ken69267@gentoo.org> nm-applet-0.6.6.ebuild:
+  amd64 stable, bug #228837. Removed unused autotools inherit.
+
+  26 Jun 2008; Robert Buchholz <rbu@gentoo.org>
+  -nm-applet-0.6.5_p20080208.ebuild, nm-applet-0.6.6.ebuild:
+  Readd ~ppc which was dropped due to >=hal-0.5.10 dependency, and remove old
+  version.
+
+*nm-applet-0.6.6 (07 Mar 2008)
+
+  07 Mar 2008; Steev Klimaszewski <steev@gentoo.org> -files/10-po_fr.patch,
+  -files/12-po_jp.patch, -files/nm-applet-makefile.am-2.patch,
+  -files/11-po_de.patch, -files/nm-applet-po-linguas.patch,
+  -files/nm-applet-potfiles.patch, -files/nm-editor-fdo-categories.patch,
+  -nm-applet-0.6.5.98.ebuild, +nm-applet-0.6.6.ebuild:
+  New upstream release, remove the old patches that 0.6.5.98 were using.
+
+*nm-applet-0.6.5.98 (14 Feb 2008)
+
+  14 Feb 2008; Steev Klimaszewski <steev@gentoo.org>
+  +files/nm-applet-makefile.am-2.patch, +files/10-po_fr.patch,
+  +files/11-po_de.patch, +files/12-po_jp.patch,
+  +files/nm-applet-po-linguas.patch, +files/nm-applet-potfiles.patch,
+  +files/nm-editor-fdo-categories.patch, +nm-applet-0.6.5.98.ebuild:
+  Add 0.6.5.98 (aka 0.6.6rc1) from upstream and some patches from Debian to
+  use po/LINGUAS, updated translations, and fix a few other misc. issues.
+
+*nm-applet-0.6.5_p20080208 (10 Feb 2008)
+
+  10 Feb 2008; Steev Klimaszewski <steev@gentoo.org>
+  -nm-applet-0.6.5_p20080131.ebuild, +nm-applet-0.6.5_p20080208.ebuild:
+  Bump nm-applet snapshot
+
+  07 Feb 2008; Gilles Dartiguelongue <eva@gentoo.org>
+  nm-applet-0.6.5_p20080131.ebuild:
+  fix intltool test
+
+  07 Feb 2008; Steev Klimaszewski <steev@gentoo.org> nm-applet-0.6.5.ebuild,
+  nm-applet-0.6.5_p20080131.ebuild:
+  Remove the dependency on libnl.  NetworkManager is what actually requires it.
+
+  02 Feb 2008; Steev Klimaszewski <steev@gentoo.org>
+  nm-applet-0.6.5_p20080131.ebuild:
+  Fix the RDEPEND USE flag (was notify, is now (correctly) libnotify) Thanks
+  to Mr_Bones_ for pointing it out.
+
+*nm-applet-0.6.5_p20080131 (02 Feb 2008)
+
+  02 Feb 2008; Steev Klimaszewski <steev@gentoo.org> nm-applet-0.6.5.ebuild,
+  +nm-applet-0.6.5_p20080131.ebuild:
+  Fix quoting issues in 0.6.5, add a bump to work with the new snapshot just
+  added for networkmanager. Includes a spiffy new wireless network editor so
+  you no longer have to putz around in gconf.
+
+  25 Dec 2007; Christian Heim <phreak@gentoo.org> metadata.xml:
+  Removing metalgod from metadata.xml as per #99350.
+
+  28 Aug 2007; nixnut <nixnut@gentoo.org> nm-applet-0.6.5.ebuild:
+  Stable on ppc wrt bug 189781
+
+  26 Aug 2007; Wulf C. Krueger <philantrop@gentoo.org>
+  nm-applet-0.6.5.ebuild:
+  Marked stable on amd64 as per bug 189781.
+
+  24 Aug 2007; Christian Faulhammer <opfer@gentoo.org>
+  nm-applet-0.6.5.ebuild:
+  stable x86, bug 189781
+
+  14 May 2007; Steev Klimaszewski <steev@gentoo.org> ChangeLog:
+  Fix the homepage url, fixes bug #178101, Thanks to Pacho Ramos
+  <pacho@condmat1.ciencias.uniovi.es> for reporting
+
+  13 May 2007; Thilo Bangert <bangert@gentoo.org> metadata.xml:
+  fix herd
+
+  11 May 2007; Gustavo Zacarias <gustavoz@gentoo.org>
+  nm-applet-0.6.5.ebuild:
+  Keyworded ~ppc
+
+  04 May 2007; Steev Klimaszewski <steev@gentoo.org> nm-applet-0.6.5.ebuild:
+  Fix the dependency/iuse mismatch issue reported by Jakub Moc in bug #177002.
+
+*nm-applet-0.6.5 (02 May 2007)
+
+  02 May 2007; Steev Klimaszewski <steev@gentoo.org>
+  +files/nm-applet-0.6.5-confchanges.patch, +metadata.xml,
+  +nm-applet-0.6.5.ebuild:
+  New upstream release of NetworkManager, splits out the gnome applet, which
+  became this package.
+
