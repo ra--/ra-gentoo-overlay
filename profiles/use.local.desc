@@ -4,6 +4,5 @@
 # This file contains descriptions of local USE flags, and the ebuilds which
 # contain them.
 
-sys-apps/paludis:glsa - Add support for GLSA
 sys-boot/grub:tpm - Add support for TPM
 sys-fs/squashfs:lzma - Add lzma support
