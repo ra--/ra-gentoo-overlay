@@ -17,8 +17,8 @@ KMNODOCS=true
 DEPEND="dbus? ( sys-apps/dbus )
 		hal? ( sys-apps/hal )"
 
-PATCHES=("${FILESDIR}/${P}-ksmserver_suspend.diff
-		 ${FILESDIR}/${P}-suspend_configure.diff")
+PATCHES=("${FILESDIR}/ksmserver-suspend.diff
+		 ${FILESDIR}/ksmserver-configure.diff")
 
 src_compile() {
 	myconf="${myconf}
