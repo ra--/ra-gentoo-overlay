@@ -2,6 +2,10 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  22 Apr 2009; Robert A <r_a@lavabit.com>
+  +thinking-rock-bin-2.2.1.ebuild:
+  Bump to 2.2.1
+
   17 Jan 2009; Robert A <r_a@lavabit.com>
   +thinking-rock-bin-2.0.1.ebuild,+files/tr.patch:
   Bump to 2.0.1
