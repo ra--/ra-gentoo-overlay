@@ -1,0 +1,21 @@
+AUX net.issue.sample 117 RMD160 1b5b7ce577192eef09987f498407f347378effb4 SHA1 6eca0dfe3c51bf4a23cfbd8197c1b93c91772dc5 SHA256 14c92d55c12c680c69f557bbfbeaa4d03e652d4e06d1bedd8fecf7faaf076706
+MD5 6d23345a3ccb8e7b572752f14aee4860 files/net.issue.sample 117
+RMD160 1b5b7ce577192eef09987f498407f347378effb4 files/net.issue.sample 117
+SHA256 14c92d55c12c680c69f557bbfbeaa4d03e652d4e06d1bedd8fecf7faaf076706 files/net.issue.sample 117
+DIST netkit-telnet-ssl_0.17.24+0.1-14.diff.gz 31014 RMD160 53ef6f2072960cfdd3b45c4de0ead955bcd1b3c9 SHA1 2dde45b14d41681858a4f063076f49d83146dc42 SHA256 cb24cb301988d1120850940df3d78e6102d7f22043dc70d2db561b2f8c558a2f
+DIST netkit-telnet-ssl_0.17.24+0.1-19.diff.gz 32674 RMD160 9566f0531bb5fd667ece9e2747832202c46dc151 SHA1 ceb3c2b52c40f4d6dfe07f43b6a73cade0ef6992 SHA256 d544713d8b0c781b48e54c5ed1e3d4e309a19745fff4fae4b0f900cbab82b52c
+DIST netkit-telnet-ssl_0.17.24+0.1.orig.tar.gz 168967 RMD160 aa22e6f0878c576f0996a41e31302d85346021a4 SHA1 204766c93aa32ee8aff51d658c7d92bd3eb4239a SHA256 1a4b45826b37bea4d8e1ac3e3ae8f7727ce87efd239038a439c80ad52c33bed7
+EBUILD netkit-telnet-ssl-0.17-r7.ebuild 1814 RMD160 b204fcee6a6329649d27c860093928d5209ab34f SHA1 7a512579f97b9e2f230b5f57036d9fc93f83f1ef SHA256 8a77ea1e844eeda2bdb4cf62fbf478be2c8a1cac8410aef73370baad4c635908
+MD5 e5aaff3431bb7ec76dc4f641d69e1bf0 netkit-telnet-ssl-0.17-r7.ebuild 1814
+RMD160 b204fcee6a6329649d27c860093928d5209ab34f netkit-telnet-ssl-0.17-r7.ebuild 1814
+SHA256 8a77ea1e844eeda2bdb4cf62fbf478be2c8a1cac8410aef73370baad4c635908 netkit-telnet-ssl-0.17-r7.ebuild 1814
+EBUILD netkit-telnet-ssl-0.17-r8.ebuild 1824 RMD160 ca62800bde13502f11192e6d7d7c33e7af5db885 SHA1 7d421e40f3c489d426f4bf11a45f7c7ee2cb1d7f SHA256 0a235da777b8648fcf9f174ca6fd08025b33be9d87d08d84a9584911e1fd1004
+MD5 87487b4f9a7152dc8fe850eefae9e3f7 netkit-telnet-ssl-0.17-r8.ebuild 1824
+RMD160 ca62800bde13502f11192e6d7d7c33e7af5db885 netkit-telnet-ssl-0.17-r8.ebuild 1824
+SHA256 0a235da777b8648fcf9f174ca6fd08025b33be9d87d08d84a9584911e1fd1004 netkit-telnet-ssl-0.17-r8.ebuild 1824
+MD5 312ab59ae3ea9835118d2020bbef8805 files/digest-netkit-telnet-ssl-0.17-r7 602
+RMD160 bd86289c841a1aa8bcd075afe1a441ca803c26f6 files/digest-netkit-telnet-ssl-0.17-r7 602
+SHA256 532189aa96b8f4c0ab0496a0131dafce3bbc8f4da245418d44498d20012115aa files/digest-netkit-telnet-ssl-0.17-r7 602
+MD5 82cff7adbbbaa97fac08162079a68f61 files/digest-netkit-telnet-ssl-0.17-r8 602
+RMD160 74eee328735f14ad651c5532f4b51f324a7b241f files/digest-netkit-telnet-ssl-0.17-r8 602
+SHA256 da330292533b84584d505b90e05b4dacb758c53899e26533dc9a3f1c9edc2f84 files/digest-netkit-telnet-ssl-0.17-r8 602
